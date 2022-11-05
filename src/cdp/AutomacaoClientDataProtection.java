@@ -122,6 +122,7 @@ public class AutomacaoClientDataProtection {
     		try {
     			diretorioLogs = Util.getValor("caminho.diretorio.relatorios") + "/" + dataAtual;
     			subdiretorioRelatoriosBaixados = Util.getValor("caminho.download.relatorios") + "\\" + dataAtual;
+    			subdiretorioRelatoriosBaixados2 = Util.getValor("caminho.download.relatorios") + "/" + dataAtual;
     			Util.criaDiretorio(subdiretorioRelatoriosBaixados);
     			
     			// As vezes o diretorio que armazena dados temporarios do Chome simplesmente some, dai o Selenium da pau na hora de chamar o browser
@@ -179,7 +180,8 @@ public class AutomacaoClientDataProtection {
     		clicarLinkTelefonicaGroup(driver, wait, js);
     		
     		// Faz o download do relatório Controls Due This Month
-    		fazerDownloadRelatorioControlsDueThisMonth(driver, wait, js);
+    		String nomeRelatorioControlsDueThisMonth = "ControlsDueThisMonth.xlsx";
+    		fazerDownloadRelatorioControlsDueThisMonth(driver, wait, js, nomeRelatorioControlsDueThisMonth);
     		
     		// Acessa o site Client Data Protection na aba original
     		//((JavascriptExecutor) driver).executeScript("window.open()");
@@ -188,7 +190,11 @@ public class AutomacaoClientDataProtection {
     		acessarClientDataProtection(driver, wait, js);
     		
     		// Faz o download do relatório Operational Risk Index By Client
-    		fazerDownloadRelatorioOperationalRiskIndexByClient(driver, wait, js);
+    		String nomeRelatorioOperationalRiskIndexByClient = "Operational Risk Index By Client.xlsx";
+    		fazerDownloadRelatorioOperationalRiskIndexByClient(driver, wait, js,  nomeRelatorioOperationalRiskIndexByClient);
+    		
+    		// Lê o relatório Controls Due This Month
+    		lerRelatorioControlsDueThisMonth(driver, wait, js, subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados);
     		
     		// Faz o download do relatório 
     		/*
@@ -259,7 +265,7 @@ public class AutomacaoClientDataProtection {
     	Thread.sleep(5000);
     }
     
-    public static void fazerDownloadRelatorioControlsDueThisMonth(WebDriver driver, WebDriverWait wait, JavascriptExecutor js) throws Exception {
+    public static void fazerDownloadRelatorioControlsDueThisMonth(WebDriver driver, WebDriverWait wait, JavascriptExecutor js, String nomeRelatorioControlsDueThisMonth) throws Exception {
     	
     	// Clicando no link  Show Summary Statistics & CDP Operational Compliance
     	String idOlhinho = "showSummaryTableText";
@@ -274,14 +280,13 @@ public class AutomacaoClientDataProtection {
     	// Tive que apelar para o Robot ;)
     	clickBotaoSalvarRelatorio();
     	
-    	String nomeRelatorioControlsDueThisMonth = "ControlsDueThisMonth.xlsx";
     	//Move o excel baixado do diretorio relatorios para o diretorio correto
     	Util.moverArquivosEntreDiretorios(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados);
     	Thread.sleep(1000);
     	
     }
     
-    public static void fazerDownloadRelatorioOperationalRiskIndexByClient(WebDriver driver, WebDriverWait wait, JavascriptExecutor js) throws Exception {
+    public static void fazerDownloadRelatorioOperationalRiskIndexByClient(WebDriver driver, WebDriverWait wait, JavascriptExecutor js, String nomeRelatorioOperationalRiskIndexByClient) throws Exception {
     	
     	// Clicando no link REPORTS
     	String idReports = "//*[@id=\"oppMobDelTabs\"]/li[2]/span";
@@ -296,47 +301,11 @@ public class AutomacaoClientDataProtection {
     	// Tive que apelar para o Robot ;)
     	clickBotaoSalvarRelatorio();
     	
-    	String nomeRelatorioOperationalRiskIndexByClient = "Operational Risk Index By Client.xlsx";
     	//Move o excel baixado do diretorio relatorios para o diretorio correto
     	Util.moverArquivosEntreDiretorios(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioOperationalRiskIndexByClient, subdiretorioRelatoriosBaixados);
     	Thread.sleep(1000);
     	
     }
-
-    
-    public static void moverArquivosEntreDiretorios(WebDriver driver, WebDriverWait wait, JavascriptExecutor js, String caminhoArquivoOrigem, String caminhoDiretorioDestino) throws Exception{
-    	
-    	boolean sucesso = true;
-    	File arquivoOrigem = new File(caminhoArquivoOrigem);
-        File diretorioDestino = new File(caminhoDiretorioDestino);
-        if (arquivoOrigem.exists() && diretorioDestino.exists()) {
-        	sucesso = arquivoOrigem.renameTo(new File(diretorioDestino, arquivoOrigem.getName()));
-        }
-        
-        if (!sucesso) {
-        	contadorErrosMoverArquivos++;
-        	
-            // Tento mover o arquivo por at� 20 vezes
-            if (contadorErrosMoverArquivos <= 20) {
-            	
-				System.out.println("Deu erro no metodo moverArquivosEntreDiretorios, tentativa de acerto: " + contadorErrosMoverArquivos);
-				// Est� dando erro de logout no servidor
-				// O bot�o de logout est� ficando escondido
-				// ent�o retirarei o logout e o login por enquanto
-				fazerLogoutAdquira(driver, wait);
-				fazerLoginAdquira(driver, wait, js);
-				//acessarPaginaInicial(driver, wait);
-				fazerDownlodRelatorioPorPeriodo(driver, wait, js);
-				moverArquivosEntreDiretorios(driver, wait, js, caminhoArquivoOrigem, caminhoDiretorioDestino);
-            
-            } else {
-            	throw new Exception("Ocorreu um erro no momento de mover o relat�rio " + caminhoArquivoOrigem + " para " + caminhoDiretorioDestino);
-            }
-        	
-        }
-        
-    }
-
     
     public static void clickBotaoSalvarRelatorio1(WebDriver driver, int posicaoX, int posicaoY) throws Exception {
     	
@@ -402,7 +371,7 @@ public class AutomacaoClientDataProtection {
 
     
     @SuppressWarnings("resource")
-	public static void lerRelatorioExcel(WebDriver driver, WebDriverWait wait, JavascriptExecutor js, String relatorio, String subdiretorioRelatoriosBaixados) throws Exception {
+	public static void lerRelatorioControlsDueThisMonth(WebDriver driver, WebDriverWait wait, JavascriptExecutor js, String relatorio, String subdiretorioRelatoriosBaixados) throws Exception {
 
         try {
                FileInputStream arquivo = new FileInputStream(new File(
@@ -538,7 +507,7 @@ public class AutomacaoClientDataProtection {
 				//acessarPaginaInicial(driver, wait);
 				fazerDownlodRelatorioPorPeriodo(driver, wait, js);
 				moverArquivosEntreDiretorios(driver, wait, js, Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioBaixado, subdiretorioRelatoriosBaixados);
-         	    lerRelatorioExcel(driver, wait, js, relatorio, subdiretorioRelatoriosBaixados);
+         	    lerRelatorioControlsDueThisMonth(driver, wait, js, relatorio, subdiretorioRelatoriosBaixados);
             
             } else {
          	   throw new Exception("Arquivo Excel n�o encontrado! : " + e);
