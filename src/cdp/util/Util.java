@@ -37,6 +37,7 @@ public class Util {
         return props;
     }
     
+    /*
 	public static void converteValorNullParaEspacoEmBranco(Pedido pedido) {
 		
 		if(pedido.getContractNumber().getContrato()==null || pedido.getContractNumber().getContrato().isEmpty()	){          pedido.getContractNumber().setContrato(" ");   				}
@@ -51,7 +52,21 @@ public class Util {
 		if(pedido.getObservacaoSharepoint()==null || pedido.getObservacaoSharepoint().isEmpty()	){          pedido.setObservacaoSharepoint(" ");	      			}
 
 	}
-	
+	*/
+    
+    public static boolean possuiValor(String valor){
+    	
+    	boolean possuiValor = false;
+
+    	if (valor != null && !valor.isEmpty() && !"null".equals(valor)) {
+    		
+    		possuiValor = true;
+    		
+    	}
+		return possuiValor;
+    }
+
+    
     public static void criaDiretorio(String caminhoDiretorio){
         File diretorio = new File(caminhoDiretorio);
         if (!diretorio.exists()) {

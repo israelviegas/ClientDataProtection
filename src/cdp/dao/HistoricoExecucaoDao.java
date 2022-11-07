@@ -6,9 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import adquira.util.ConnectionFactory;
-import adquira.util.Util;
+import cdp.util.ConnectionFactory;
+import cdp.util.Util;
 
 public class HistoricoExecucaoDao {
 	

@@ -70,6 +70,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import bean.RelatorioControlsDueThisMonth;
+import bean.RelatorioOperationalRiskIndexByClient;
+import cdp.dao.ClientDataProtectionDao;
 import cdp.dao.HistoricoExecucaoDao;
 import cdp.util.Util;
 
@@ -92,6 +95,10 @@ public class AutomacaoClientDataProtection {
 //	private static List<Pedido> listaPedidosNaoFaturados = null;
 //	private static List<Pedido> listaPedidosNaoFaturadosAuxiliar = null;
 	private static String listaPedidosComErrosNasRegraDePreenchimentoNoSharePoint = "";
+	
+	private static List<RelatorioControlsDueThisMonth> listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
+	private static List<RelatorioOperationalRiskIndexByClient> listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
+	
 	private static int contadorErros;
 	private static int contadorErroslerRelatorioExcel = 0;
 	private static int contadorfazerDownlodRelatorioPorPeriodo = 0;
@@ -122,7 +129,7 @@ public class AutomacaoClientDataProtection {
     		try {
     			diretorioLogs = Util.getValor("caminho.diretorio.relatorios") + "/" + dataAtual;
     			subdiretorioRelatoriosBaixados = Util.getValor("caminho.download.relatorios") + "\\" + dataAtual;
-    			subdiretorioRelatoriosBaixados2 = Util.getValor("caminho.download.relatorios") + "/" + dataAtual;
+    			subdiretorioRelatoriosBaixados2 = diretorioLogs;
     			Util.criaDiretorio(subdiretorioRelatoriosBaixados);
     			
     			// As vezes o diretorio que armazena dados temporarios do Chome simplesmente some, dai o Selenium da pau na hora de chamar o browser
@@ -136,7 +143,7 @@ public class AutomacaoClientDataProtection {
             
     		} catch (Exception e) {
     			Util.gravarArquivo(diretorioLogs, "Erro ClientDataProtection" + " " + dataAtual, ".txt", e.getMessage(), "Ocorreu um erro na automacao de extracao de relatorios: ");
-    			inserirStatusExecucaoNoBanco("ClientDataProtection", dataAtualPlanilhaFinal, "Erro de execucao do robo");
+    			inserirStatusExecucaoNoBanco("ClientDataProtection", dataAtualPlanilhaFinal, "Erro");
     		} finally {
     			if (driver != null) {
     				driver.quit();
@@ -194,35 +201,21 @@ public class AutomacaoClientDataProtection {
     		fazerDownloadRelatorioOperationalRiskIndexByClient(driver, wait, js,  nomeRelatorioOperationalRiskIndexByClient);
     		
     		// Lê o relatório Controls Due This Month
-    		lerRelatorioControlsDueThisMonth(driver, wait, js, subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados);
+    		lerRelatorioControlsDueThisMonth(subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados);
     		
-    		// Faz o download do relatório 
-    		/*
-    		fazerDownloadRelatorioOperationalRiskIndexByClient(driver, wait, js);
+    		// Deleto o que estiver na tabela CDP_Controls_Due e gravo o relatório Controls Due This Month na mesma tabela
+    		deletaEInsereRelatorioControlsDueThisMonthNoBanco();
     		
-    		if (extracaoPossuiPedidos) {
-    			existemPedidos = true;
-    			//Move o relatorio baixado do diretorio relatorios para o diretorio correto
-    			//Util.moverArquivosEntreDiretorios(driver, wait, js, Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioBaixado, subdiretorioRelatoriosBaixados);
-    			//Thread.sleep(5000);
-    			
-    			// Le o relatorio baixado
-    			//lerRelatorioExcel(driver, wait, js, subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioBaixado, subdiretorioRelatoriosBaixados);
-    			
-    		}
+    		// Lê o relatório Operational Risk Index By Client
+    		lerRelatorioOperationalRiskIndexByClient(subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioOperationalRiskIndexByClient, subdiretorioRelatoriosBaixados);
     		
-    		// Gravo em um arquivo os Pedidos que tiveram problemas nas regras de preenchimento
-    		if (listaPedidosComErrosNasRegraDePreenchimentoNoSharePoint != null && !listaPedidosComErrosNasRegraDePreenchimentoNoSharePoint.isEmpty()) {
-    			//Util.gravarArquivo(subdiretorioRelatorioFinal2, "Pedidos com Erros nas Regras de Preenchimento no Sharepoint" + " " + dataAtual, ".txt", listaPedidosComErrosNasRegraDePreenchimentoNoSharePoint, "");
-    		}
-    		*/
+    		// Deleto o que estiver na tabela CDP_Operational_Risc e gravo o relatório Operational Risk Index By Client na mesma tabela
+    		deletaEInsereRelatorioOperationalRiskIndexByClient();
     		
     		Util.gravarArquivo(diretorioLogs, "Sucesso ClientDataProtection" + " " + dataAtual, ".txt", "", mensagemResultadoClientDataProtection);
     		
-    		// Grava na tabela Tb_Historico_Execucao_Robos o servi�o, data e hora e status da execu��o
-    		//inserirStatusExecucaoNoBanco("ClientDataProtection", dataAtualPlanilhaFinal, mensagemResultadoAdquira);
-    		
-    		//mensagemSucesso();
+    		// Grava na tabela Tb_Historico_Execucao_Robos o servico, data e hora e status da execucao
+    		inserirStatusExecucaoNoBanco("ClientDataProtection", dataAtualPlanilhaFinal, "Sucesso");
     		
     		System.out.println("Fim: " + new SimpleDateFormat("dd_MM_yyyy HH_mm_ss").format(new Date()));
     		
@@ -235,8 +228,8 @@ public class AutomacaoClientDataProtection {
 			
 		} catch (Exception e) {
 			contadorExecutaAutomacaoClientDataProtection ++;
-			// Executo ate 20 vezes se der erro no executaAutomacaoAdquiraSharepoint
-			if (contadorExecutaAutomacaoClientDataProtection <= 20) {
+			// Executo ate 5 vezes se der erro no executaAutomacaoAdquiraSharepoint
+			if (contadorExecutaAutomacaoClientDataProtection <= 5) {
 				
 				System.out.println("Deu erro no metodo executaAutomacaoClientDataProtection, tentativa de acerto: " + contadorExecutaAutomacaoClientDataProtection);
 				executaAutomacaoClientDataProtection(driver);
@@ -336,7 +329,7 @@ public class AutomacaoClientDataProtection {
     	Robot robot = new Robot();
  //   	robot.mouseMove(0, 0); 
     	
-    	Thread.sleep(30000);
+    	Thread.sleep(40000);
     	// Apertando o tab 6 vezes até chegar no botão de salvar
     	for (int i = 1; i <= 6; i++) {
     		robot.keyPress(KeyEvent.VK_TAB);
@@ -359,7 +352,7 @@ public class AutomacaoClientDataProtection {
     	// Enter no botão de gerar relatório em excel
     	robot.keyPress(KeyEvent.VK_ENTER);
     	robot.keyRelease(KeyEvent.VK_ENTER);
-    	Thread.sleep(20000);
+    	Thread.sleep(40000);
     	
         /*
     	Robot bot = new Robot();
@@ -368,10 +361,63 @@ public class AutomacaoClientDataProtection {
         bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
         */
     }
-
     
+    public static void deletaEInsereRelatorioControlsDueThisMonthNoBanco() throws Exception {
+    	
+    	if (listaRelatorioControlsDueThisMonth != null && !listaRelatorioControlsDueThisMonth.isEmpty()) {
+    		
+    		int contador = 0;
+    		
+    		ClientDataProtectionDao deletarClientDataProtectionDao = new ClientDataProtectionDao();
+    		// Deleto o que estiver na tabela CDP_Controls_Due
+    		deletarClientDataProtectionDao.deletarRelatorioControlsDueThisMonth();
+    		System.out.println("Relatorio Controls Due This Month. Apaguei todos os dados do banco");
+
+    		for (RelatorioControlsDueThisMonth relatorioControlsDueThisMonth : listaRelatorioControlsDueThisMonth) {
+    			ClientDataProtectionDao inserirClientDataProtectionDao = new ClientDataProtectionDao();
+    			inserirClientDataProtectionDao.inserirRelatorioControlsDueThisMonth(relatorioControlsDueThisMonth);
+    			contador++;
+    			System.out.println("Relatorio Controls Due This Month. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioControlsDueThisMonth.size());
+    			
+    		}
+    		
+    	} else {
+    		
+    		System.out.println("O relatorio Controls Due This Month está vazio");
+    		
+    	}
+    
+    }
+    
+    public static void deletaEInsereRelatorioOperationalRiskIndexByClient() throws Exception {
+    	
+    	if (listaRelatorioOperationalRiskIndexByClient != null && !listaRelatorioOperationalRiskIndexByClient.isEmpty()) {
+    		
+    		int contador = 0;
+    		
+    		ClientDataProtectionDao deletarClientDataProtectionDao = new ClientDataProtectionDao();
+    		// Deleto o que estiver na tabela CDP_Operational_Risc
+    		deletarClientDataProtectionDao.deletarRelatorioOperationalRiskIndexByClient();
+    		System.out.println("Relatorio Operational Risk Index By Client. Apaguei todos os dados do banco");
+
+    		for (RelatorioOperationalRiskIndexByClient relatorioOperationalRiskIndexByClient : listaRelatorioOperationalRiskIndexByClient) {
+    			ClientDataProtectionDao inserirClientDataProtectionDao = new ClientDataProtectionDao();
+    			inserirClientDataProtectionDao.inserirRelatorioOperationalRiskIndexByClient(relatorioOperationalRiskIndexByClient);
+    			contador++;
+    			System.out.println("Relatorio Operational Risk Index By Client. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioOperationalRiskIndexByClient.size());
+    			
+    		}
+    		
+    	} else {
+    		
+    		System.out.println("O relatorio Operational Risk Index By Client está vazio");
+    		
+    	}
+    
+    }
+
     @SuppressWarnings("resource")
-	public static void lerRelatorioControlsDueThisMonth(WebDriver driver, WebDriverWait wait, JavascriptExecutor js, String relatorio, String subdiretorioRelatoriosBaixados) throws Exception {
+	public static void lerRelatorioControlsDueThisMonth(String relatorio, String subdiretorioRelatoriosBaixados) throws Exception {
 
         try {
                FileInputStream arquivo = new FileInputStream(new File(
@@ -389,12 +435,123 @@ public class AutomacaoClientDataProtection {
             	   
             	   Iterator<Row> rowIterator = sheetPedidos.iterator();
             	   
-            	   Pedido pedido = null;
-            	   String azul = "FF99CCFF";
-            	   String verde = "FFCCFFCC";
+            	   RelatorioControlsDueThisMonth relatorioControlsDueThisMonth = null;
             	   
-            	   List<Pedido> listaPedidosDeLinhaAzul = new ArrayList<Pedido>();
-            	   List<Pedido> listaPedidosDeLinhaVerde = new ArrayList<Pedido>();
+            	   while (rowIterator.hasNext()) {
+            		   
+            		   Row row = rowIterator.next();
+            		   
+            		   if (row.getRowNum() == 0 || row.getRowNum() == 1) {
+            			   continue;
+            		   }
+            		   
+            		   Iterator<Cell> cellIterator = row.cellIterator();
+        			   relatorioControlsDueThisMonth = new RelatorioControlsDueThisMonth();
+        			   
+        			   while (cellIterator.hasNext()) {
+        				   Cell cell = cellIterator.next();
+        				   
+        				   switch (cell.getColumnIndex()) {
+        				   case 0:
+        					   relatorioControlsDueThisMonth.setClientName(cell.getStringCellValue());
+        					   break;
+        				   case 1:
+        					   relatorioControlsDueThisMonth.setControlName(cell.getStringCellValue());
+        					   break;
+        				   case 2:
+        					   relatorioControlsDueThisMonth.setControlID(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 3:
+        					   relatorioControlsDueThisMonth.setControlOwner(cell.getStringCellValue());
+        					   break;       
+        				   case 4:
+        					   relatorioControlsDueThisMonth.setIndicator(cell.getStringCellValue());
+        					   break;
+        				   case 5:
+        					   relatorioControlsDueThisMonth.setNextDueDate(cell.getStringCellValue());
+        					   break;
+        				   case 6:
+        					   relatorioControlsDueThisMonth.setVerified(cell.getStringCellValue());
+        					   break;
+        				   case 7:
+        					   relatorioControlsDueThisMonth.setDeliveryLocationSource(cell.getStringCellValue());
+        					   break;
+        				   case 8:
+        					   relatorioControlsDueThisMonth.setServiceName(cell.getStringCellValue());
+        					   break;
+           				   case 9:
+        					   relatorioControlsDueThisMonth.setClientDataProtectionRequirement(cell.getStringCellValue());
+        					   break;
+        				   case 10:
+        					   relatorioControlsDueThisMonth.setRelatedContractualRequirement(cell.getStringCellValue());
+        					   break;
+        				   case 11:
+        					   relatorioControlsDueThisMonth.setRegulatoryRequirement(cell.getStringCellValue());
+        					   break;       
+        				   case 12:
+        					   //relatorioControlsDueThisMonth.setEngagementLevelProcedure(cell.getStringCellValue());
+        					   break;
+        				   case 13:
+        					   relatorioControlsDueThisMonth.setEngagementLevelProcedure(cell.getStringCellValue());
+        					   break;
+        				   case 14:
+        					   relatorioControlsDueThisMonth.setCompliance(cell.getStringCellValue());
+        					   break;
+        				   case 15:
+        					   relatorioControlsDueThisMonth.setOngoingFrequency(cell.getStringCellValue());
+        					   break;
+        				   }
+
+        			   }
+        			   
+		        	   // Data Extracao
+		        	    relatorioControlsDueThisMonth.setDataExtracao(dataAtualPlanilhaFinal);
+		        	    
+		        	    listaRelatorioControlsDueThisMonth.add(relatorioControlsDueThisMonth);
+            		   
+            	   }
+            	   arquivo.close();
+            	   
+               }
+
+		} catch (Exception e) {
+     	   contadorErroslerRelatorioExcel ++;
+            Thread.sleep(3000);
+            System.out.println("Arquivo Excel nao encontrado! Tentando resolver, tentativa de numero: " + contadorErroslerRelatorioExcel);
+            
+            // Tento ler o arquivo por ate 5 vezes
+            if (contadorErroslerRelatorioExcel <= 5) {
+            	
+				System.out.println("Deu erro no metodo lerRelatorioControlsDueThisMonth, tentativa de acerto: " + contadorErroslerRelatorioExcel);
+         	    lerRelatorioControlsDueThisMonth(relatorio, subdiretorioRelatoriosBaixados);
+            
+            } else {
+         	   throw new Exception("Arquivo Excel nao encontrado! : " + e);
+            }
+		}
+        
+  }
+    
+    @SuppressWarnings("resource")
+	public static void lerRelatorioOperationalRiskIndexByClient(String relatorio, String subdiretorioRelatoriosBaixados) throws Exception {
+
+        try {
+               FileInputStream arquivo = new FileInputStream(new File(
+            		   relatorio));
+               
+               File arquivoExcel = new File(relatorio);
+               
+               if (arquivoExcel.exists() && arquivoExcel.isFile() && arquivoExcel.length() > 0) {
+            	   
+            	   OPCPackage pkg = OPCPackage.open(new File(relatorio));
+            	   
+            	   XSSFWorkbook workbook = new XSSFWorkbook(pkg);
+            	   
+            	   XSSFSheet sheetPedidos =  workbook.getSheetAt(0);
+            	   
+            	   Iterator<Row> rowIterator = sheetPedidos.iterator();
+            	   
+            	   RelatorioOperationalRiskIndexByClient relatorioOperationalRiskIndexByClient = null;
             	   
             	   while (rowIterator.hasNext()) {
             		   
@@ -405,122 +562,110 @@ public class AutomacaoClientDataProtection {
             		   }
             		   
             		   Iterator<Cell> cellIterator = row.cellIterator();
-        			   pedido = new Pedido();
-        			   boolean isAzul = false;
-        			   boolean isVerde = false;
+        			   relatorioOperationalRiskIndexByClient = new RelatorioOperationalRiskIndexByClient();
         			   
         			   while (cellIterator.hasNext()) {
         				   Cell cell = cellIterator.next();
         				   
-        				   XSSFCellStyle cellStyle = (XSSFCellStyle) cell.getCellStyle();
-        				   XSSFColor color = cellStyle.getFillForegroundColorColor();
-        				   
-        				   // Na planilha baixada do Adquira, um pedido � composto por informa��es que est�o na linha azul e na linha verde.
-        				   // Separo essas informa��es em duas listas para depois criar uma lista �nica
-
-        				   if (cell.getColumnIndex() == 0 && azul.equals(((XSSFColor)color).getARGBHex()) || cell.getColumnIndex() == 1 && azul.equals(((XSSFColor)color).getARGBHex()) ||
-        					   cell.getColumnIndex() == 2 && azul.equals(((XSSFColor)color).getARGBHex()) || cell.getColumnIndex() == 4 && azul.equals(((XSSFColor)color).getARGBHex()) ||
-        					   cell.getColumnIndex() == 5 && azul.equals(((XSSFColor)color).getARGBHex()) || cell.getColumnIndex() == 6 && azul.equals(((XSSFColor)color).getARGBHex()) ||
-        					   cell.getColumnIndex() == 11 && azul.equals(((XSSFColor)color).getARGBHex())) {
-        					   
-        					   isAzul = true;
-        					   
-        					   switch (cell.getColumnIndex()) {
-        					   case 0:
-        						   pedido.setNumero(cell.getStringCellValue());
-        						   break;
-        					   case 1:
-        						   pedido.setComprador(cell.getStringCellValue());
-        						   break;
-        					   case 2:
-        						   pedido.setCnpjCliente(cell.getStringCellValue());
-        						   break;       
-        					   case 4:
-        						   pedido.setData(formatarDataPedido(cell.getStringCellValue()));
-        						   break;
-        					   case 5:
-        						   pedido.setValor(formatarValorPedido(cell.getStringCellValue()));
-        						   break;
-        					   case 6:
-        						   pedido.setEstado(cell.getStringCellValue());
-        						   break;
-        					   case 11:
-        						   pedido.setPrazoPagamento(cell.getStringCellValue());
-        						   break;	   
-        					   }
-        					   
-        				   } else if (cell.getColumnIndex() == 0 && verde.equals(((XSSFColor)color).getARGBHex()) || cell.getColumnIndex() == 1 && verde.equals(((XSSFColor)color).getARGBHex()) ||
-        						      cell.getColumnIndex() == 2 && verde.equals(((XSSFColor)color).getARGBHex())) {
-        					   
-        					   isVerde = true;
-        					   
-        					   switch (cell.getColumnIndex()) {
-        					   case 0:
-        						   pedido.setNumero(cell.getStringCellValue());
-        						   break;
-        					   case 1:
-        						   pedido.setItem(Integer.valueOf(cell.getStringCellValue()));
-        						   break;  
-        					   case 2:
-        						   pedido.setCap(cell.getStringCellValue());
-        						   break;       
-        						   
-        					   }
+        				   switch (cell.getColumnIndex()) {
+        				   case 0:
+        					   relatorioOperationalRiskIndexByClient.setCDPTrackerID(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 1:
+        					   relatorioOperationalRiskIndexByClient.setClientName(cell.getStringCellValue());
+        					   break;
+        				   case 2:
+        					   relatorioOperationalRiskIndexByClient.setTier(cell.getStringCellValue());
+        					   break;
+        				   case 3:
+        					   relatorioOperationalRiskIndexByClient.setMasterCustomerNbr(cell.getStringCellValue());
+        					   break;       
+        				   case 4:
+        					   relatorioOperationalRiskIndexByClient.setMarket(cell.getStringCellValue());
+        					   break;
+        				   case 5:
+        					   relatorioOperationalRiskIndexByClient.setMarketUnit(cell.getStringCellValue());
+        					   break;
+        				   case 6:
+        					   relatorioOperationalRiskIndexByClient.setOwningOrganization(cell.getStringCellValue());
+        					   break;
+        				   case 7:
+        					   relatorioOperationalRiskIndexByClient.setAccountableMD(cell.getStringCellValue());
+        					   break;
+        				   case 8:
+        					   relatorioOperationalRiskIndexByClient.setAccountISL(cell.getStringCellValue());
+        					   break;
+           				   case 9:
+        					   relatorioOperationalRiskIndexByClient.setAccountContractManager(cell.getStringCellValue());
+        					   break;
+        				   case 10:
+        					   relatorioOperationalRiskIndexByClient.setCDPAccountManager(cell.getStringCellValue());
+        					   break;
+        				   case 11:
+        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskCurrent(String.valueOf(cell.getNumericCellValue()));
+        					   break;       
+        				   case 12:
+        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskCurrentColor(cell.getStringCellValue());
+        					   break;
+        				   case 13:
+        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskMonthEnd(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 14:
+        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskMonthEndColor(cell.getStringCellValue());
+        					   break;
+        				   case 15:
+        					   relatorioOperationalRiskIndexByClient.setControls30DaysPastDue(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 16:
+        					   relatorioOperationalRiskIndexByClient.setControls60DaysPastDue(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 17:
+        					   relatorioOperationalRiskIndexByClient.setNonCompliantControls(String.valueOf(cell.getNumericCellValue()));
+        					   break;       
+        				   case 18:
+        					   relatorioOperationalRiskIndexByClient.setPastDueControls(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 19:
+        					   relatorioOperationalRiskIndexByClient.setControlwHighestOperationalRisk(cell.getStringCellValue());
+        					   break;
+        				   case 20:
+        					   relatorioOperationalRiskIndexByClient.setOperationalRiskScoreOfWorstControl(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 21:
+        					   relatorioOperationalRiskIndexByClient.setIsImplemented(cell.getStringCellValue());
+        					   break;
         					   
         				   }
-        				   
+
         			   }
         			   
-		        	   // Data Extra��o
-		        	    pedido.setDataExtracao(dataAtualPlanilhaFinal);
-            		   
-        			   if (isAzul) {
-        				   
-        				   listaPedidosDeLinhaAzul.add(pedido);
-        			   
-        			   } else if (isVerde) {
-        				   
-        				   listaPedidosDeLinhaVerde.add(pedido);
-        			   }
+		        	   // Data Extracao
+		        	    relatorioOperationalRiskIndexByClient.setDataExtracao(dataAtualPlanilhaFinal);
+		        	    
+		        	    listaRelatorioOperationalRiskIndexByClient.add(relatorioOperationalRiskIndexByClient);
             		   
             	   }
             	   arquivo.close();
             	   
-            	   // Unifica os pedidos de linha azul com os pedidos de linha verde na lista listaPedidos
-            	   unificaPedidosdeLinhaAzulComPedidosDeLinhaVerde(listaPedidosDeLinhaAzul, listaPedidosDeLinhaVerde, listaPedidos);
                }
 
 		} catch (Exception e) {
      	   contadorErroslerRelatorioExcel ++;
             Thread.sleep(3000);
-            System.out.println("Arquivo Excel n�o encontrado! Tentando resolver, tentativa de n�mero: " + contadorErroslerRelatorioExcel);
+            System.out.println("Arquivo Excel nao encontrado! Tentando resolver, tentativa de numero: " + contadorErroslerRelatorioExcel);
             
-            // Tento ler o arquivo por at� 20 vezes
-            if (contadorErroslerRelatorioExcel <= 20) {
+            // Tento ler o arquivo por ate 5 vezes
+            if (contadorErroslerRelatorioExcel <= 5) {
             	
-				System.out.println("Deu erro no m�todo lerRelatorioExcel, tentativa de acerto: " + contadorErroslerRelatorioExcel);
-				// Est� dando erro de logout no servidor
-				// O bot�o de logout est� ficando escondido
-				// ent�o retirarei o logout e o login por enquanto
-				fazerLogoutAdquira(driver, wait);
-				fazerLoginAdquira(driver, wait, js);
-				//acessarPaginaInicial(driver, wait);
-				fazerDownlodRelatorioPorPeriodo(driver, wait, js);
-				moverArquivosEntreDiretorios(driver, wait, js, Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioBaixado, subdiretorioRelatoriosBaixados);
-         	    lerRelatorioControlsDueThisMonth(driver, wait, js, relatorio, subdiretorioRelatoriosBaixados);
+				System.out.println("Deu erro no metodo lerRelatorioOperationalRiskIndexByClient, tentativa de acerto: " + contadorErroslerRelatorioExcel);
+				lerRelatorioOperationalRiskIndexByClient(relatorio, subdiretorioRelatoriosBaixados);
             
             } else {
-         	   throw new Exception("Arquivo Excel n�o encontrado! : " + e);
+         	   throw new Exception("Arquivo Excel nao encontrado! : " + e);
             }
 		}
         
-        if (listaPedidos.size() == 0) {
-        	   throw new Exception("Lista de pedidos est� vazia");
-        }
-        
   }
-
-
     
 	   public static void mataProcessosFirefox() throws IOException, SQLException, InterruptedException{
 		   
@@ -648,9 +793,6 @@ public class AutomacaoClientDataProtection {
             
             return driver;
     } 
-
-
-	
 	
 	   public static void inserirStatusExecucaoNoBanco(String servico, String dataHora, String status) throws IOException, SQLException{
 			  
@@ -658,7 +800,5 @@ public class AutomacaoClientDataProtection {
 		   historicoExecucaoDao.inserirStatusExecucao(servico, dataHora, status);
 	   
 	   }
-
-
 
 }
