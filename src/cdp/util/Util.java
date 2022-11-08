@@ -29,8 +29,8 @@ public class Util {
         Properties props = new Properties();
         
         // String arquivoProperties = "D:/JOBS/AutomacaoAdquira/configuracoes/propriedadesAdquira.properties"; 
-        // String arquivoProperties = "C:/Automacao Adquira/configuracoes/gerar relatorio pedidos.properties"; 
-         String arquivoProperties = "C:/Viegas/desenvolvimento/Selenium/ClientDataProtection/configuracoes/propriedadesClientDataProtection.properties";
+         String arquivoProperties = "C:/AutomacaoClientDataProtection/configuracoes/propriedadesClientDataProtection.properties"; 
+        // String arquivoProperties = "C:/Viegas/desenvolvimento/Selenium/ClientDataProtection/configuracoes/propriedadesClientDataProtection.properties";
          
         FileInputStream file = new FileInputStream(arquivoProperties);
         props.load(file);

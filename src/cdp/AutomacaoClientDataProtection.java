@@ -1,57 +1,28 @@
 package cdp;
 
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.util.Date;
-import java.awt.Color;
 import java.awt.Robot;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -67,7 +38,6 @@ import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import bean.RelatorioControlsDueThisMonth;
@@ -78,48 +48,16 @@ import cdp.util.Util;
 
 public class AutomacaoClientDataProtection {
 	
-	private static String nomeRelatorioBaixado;
-	private static String nomeZipBaixado;
-	private static boolean extracaoPossuiPedidos;
-	private static boolean existemPedidos = false;
 	private static String dataAtual = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss").format(new Date());
 	private static String dataAtualPlanilhaFinal = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-	private static String dataAtualSharepoint = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
 	private static String diretorioLogs = "";
-	private static String subdiretorioPdfsBaixados = "";
-//	private static List<ContractNumber> listaContractNumbers = null;
-//	private static List<ContractNumber> listaContractNumbersTemporaria = null;
-	private static Set<String> listaNumerosContractNumbersDistintos = null;
-//	private static List<Pedido> listaPedidos = null;
-//	private static List<Pedido> listaPedidosFaturados = null;
-//	private static List<Pedido> listaPedidosNaoFaturados = null;
-//	private static List<Pedido> listaPedidosNaoFaturadosAuxiliar = null;
-	private static String listaPedidosComErrosNasRegraDePreenchimentoNoSharePoint = "";
-	
 	private static List<RelatorioControlsDueThisMonth> listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
 	private static List<RelatorioOperationalRiskIndexByClient> listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
 	
-	private static int contadorErros;
 	private static int contadorErroslerRelatorioExcel = 0;
-	private static int contadorfazerDownlodRelatorioPorPeriodo = 0;
-	private static int contadorErrosMoverArquivos = 0;
-	private static int contadorErrosLogin = 0;
-	private static int contadorErrosLogout = 0;
-	private static int contadorErrosRecuperaContractNumbersSharepoint = 0;
-	private static int contadorErrosRecuperaPedidosSharepoint = 0;
-	private static int contadorErrosPreencherCamposBiling = 0;
 	private static int contadorExecutaAutomacaoClientDataProtection = 0;
-	private static int contadorLogin = 0;
-	private static String diretorioRelatorio = null;
 	private static String subdiretorioRelatoriosBaixados = null;
 	private static String subdiretorioRelatoriosBaixados2 = null;
-	private static String subdiretorioRelatorioFinal = null;
-	private static String subdiretorioRelatorioFinal2  = null;
-	private static String subdiretorioRelatorioIncremental = null;   
-	private static String subdiretorioPdfsBaixados2  = null;
-	private static String caminhoExecutavelPlanilhaContractNumbers = null;
-	private static String caminhoExecutavelPlanilhaPedidosFaturados = null;
-	
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws Exception {
@@ -178,7 +116,7 @@ public class AutomacaoClientDataProtection {
     		
     		driver = getWebDriver();
     		JavascriptExecutor js = (JavascriptExecutor) driver;
-    		WebDriverWait wait = new WebDriverWait(driver, 60);
+    		WebDriverWait wait = new WebDriverWait(driver, 100);
     		
     		// Acessa o site Client Data Protection
     		acessarClientDataProtection(driver, wait, js);
@@ -229,7 +167,7 @@ public class AutomacaoClientDataProtection {
 		} catch (Exception e) {
 			contadorExecutaAutomacaoClientDataProtection ++;
 			// Executo ate 5 vezes se der erro no executaAutomacaoAdquiraSharepoint
-			if (contadorExecutaAutomacaoClientDataProtection <= 5) {
+			if (contadorExecutaAutomacaoClientDataProtection <= 3) {
 				
 				System.out.println("Deu erro no metodo executaAutomacaoClientDataProtection, tentativa de acerto: " + contadorExecutaAutomacaoClientDataProtection);
 				executaAutomacaoClientDataProtection(driver);
@@ -260,7 +198,7 @@ public class AutomacaoClientDataProtection {
     
     public static void fazerDownloadRelatorioControlsDueThisMonth(WebDriver driver, WebDriverWait wait, JavascriptExecutor js, String nomeRelatorioControlsDueThisMonth) throws Exception {
     	
-    	// Clicando no link  Show Summary Statistics & CDP Operational Compliance
+    	// Clicando no link Show Summary Statistics & CDP Operational Compliance
     	String idOlhinho = "showSummaryTableText";
     	wait.until(ExpectedConditions.elementToBeClickable(By.id(idOlhinho))).click();
     	Thread.sleep(5000);
@@ -268,6 +206,9 @@ public class AutomacaoClientDataProtection {
     	// Clicando no link Controls Due this Month:
     	String textoControlsDueThisMonth = "Controls Due this Month:";
     	wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span [text()='"+textoControlsDueThisMonth+"']"))).click();
+    	
+    	// Digitando o usuário e senha com o Robot
+    	digitarUsuarioSenha();
     	
     	// Não consegui interagir com nenhum elemento da página do relatório usando o Selenium
     	// Tive que apelar para o Robot ;)
@@ -297,6 +238,45 @@ public class AutomacaoClientDataProtection {
     	//Move o excel baixado do diretorio relatorios para o diretorio correto
     	Util.moverArquivosEntreDiretorios(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioOperationalRiskIndexByClient, subdiretorioRelatoriosBaixados);
     	Thread.sleep(1000);
+    	
+    }
+    
+    public static void digitarUsuarioSenha() throws Exception {
+    	
+    	Robot robo = new Robot();
+    	RoboCapturaTeclas rob = new RoboCapturaTeclas(robo);
+    	if ("S".equals(Util.getValor("digita.automaticamente.usuario"))) {
+    		Thread.sleep(10000);
+    		//robo.delay(1500);
+    		
+    		// Digita o e-mail
+    		rob.datilografar(Util.getValor("username"));
+    		Thread.sleep(1000);
+    	
+    	}
+
+    	if ("S".equals(Util.getValor("digita.automaticamente.senha"))) {
+    		Thread.sleep(3000);
+    		// Apertando o tab 1 vez para chegar na senha
+    		robo.keyPress(KeyEvent.VK_TAB);
+    		robo.keyRelease(KeyEvent.VK_TAB);
+    		//robo.delay(1500);
+    		Thread.sleep(1000);
+    		
+    		// Digita a senha
+    		rob.datilografar(Util.getValor("senha"));
+    		Thread.sleep(1000);
+    		
+    		// Apertando o tab 1 vez para chegar no botão de fazer login
+    		robo.keyPress(KeyEvent.VK_TAB);
+    		robo.keyRelease(KeyEvent.VK_TAB);
+    		Thread.sleep(1000);
+    		
+    		// Aperta o ENTER no botão de fazer login
+    		robo.keyPress(KeyEvent.VK_ENTER);
+    		robo.keyRelease(KeyEvent.VK_ENTER);
+    		
+    	}
     	
     }
     
@@ -520,7 +500,7 @@ public class AutomacaoClientDataProtection {
             System.out.println("Arquivo Excel nao encontrado! Tentando resolver, tentativa de numero: " + contadorErroslerRelatorioExcel);
             
             // Tento ler o arquivo por ate 5 vezes
-            if (contadorErroslerRelatorioExcel <= 5) {
+            if (contadorErroslerRelatorioExcel <= 3) {
             	
 				System.out.println("Deu erro no metodo lerRelatorioControlsDueThisMonth, tentativa de acerto: " + contadorErroslerRelatorioExcel);
          	    lerRelatorioControlsDueThisMonth(relatorio, subdiretorioRelatoriosBaixados);
@@ -655,7 +635,7 @@ public class AutomacaoClientDataProtection {
             System.out.println("Arquivo Excel nao encontrado! Tentando resolver, tentativa de numero: " + contadorErroslerRelatorioExcel);
             
             // Tento ler o arquivo por ate 5 vezes
-            if (contadorErroslerRelatorioExcel <= 5) {
+            if (contadorErroslerRelatorioExcel <= 3) {
             	
 				System.out.println("Deu erro no metodo lerRelatorioOperationalRiskIndexByClient, tentativa de acerto: " + contadorErroslerRelatorioExcel);
 				lerRelatorioOperationalRiskIndexByClient(relatorio, subdiretorioRelatoriosBaixados);
