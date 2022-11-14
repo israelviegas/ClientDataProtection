@@ -23,31 +23,33 @@ public class RelatorioOperationalRiskIndexByClient {
 	String AccountContractManager;
 
 	String CDPAccountManager;
-
-	String WeightedOperationalRiskCurrent;
-
-	String WeightedOperationalRiskCurrentColor;
-
-	String WeightedOperationalRiskMonthEnd;
-
-	String WeightedOperationalRiskMonthEndColor;
-
-	String Controls30DaysPastDue;
-
-	String Controls60DaysPastDue;
-
-	String NonCompliantControls;
-
-	String PastDueControls;
-
-	String ControlwHighestOperationalRisk;
-
-	String OperationalRiskScoreOfWorstControl;
-
-	String IsImplemented;
+	
+	String	CDPControlID;
+	
+	String	ControlName;
+		
+	String	ControlCategory;
+		
+	String	DeliveryLocationSource;
+		
+	String	ControlOwner;
+		
+	String	ComplianceStatus;
+		
+	String	LastCompletedDate;
+		
+	String	NextDueDate;
+		
+	String	NbrDaysNonCompliant;
+		
+	String	NbrDaysPastDue;
+		
+	String	WeightedOperationalRisk;
+		
+	String	MonthEndWeightedOperationalRisk;
 	
 	String	dataExtracao;
-
+	
 	public String getCDPTrackerID() {
 		return CDPTrackerID;
 	}
@@ -128,6 +130,102 @@ public class RelatorioOperationalRiskIndexByClient {
 		AccountContractManager = accountContractManager;
 	}
 
+	public String getCDPControlID() {
+		return CDPControlID;
+	}
+
+	public void setCDPControlID(String cDPControlID) {
+		CDPControlID = cDPControlID;
+	}
+
+	public String getControlName() {
+		return ControlName;
+	}
+
+	public void setControlName(String controlName) {
+		ControlName = controlName;
+	}
+
+	public String getControlCategory() {
+		return ControlCategory;
+	}
+
+	public void setControlCategory(String controlCategory) {
+		ControlCategory = controlCategory;
+	}
+
+	public String getDeliveryLocationSource() {
+		return DeliveryLocationSource;
+	}
+
+	public void setDeliveryLocationSource(String deliveryLocationSource) {
+		DeliveryLocationSource = deliveryLocationSource;
+	}
+
+	public String getControlOwner() {
+		return ControlOwner;
+	}
+
+	public void setControlOwner(String controlOwner) {
+		ControlOwner = controlOwner;
+	}
+
+	public String getComplianceStatus() {
+		return ComplianceStatus;
+	}
+
+	public void setComplianceStatus(String complianceStatus) {
+		ComplianceStatus = complianceStatus;
+	}
+
+	public String getLastCompletedDate() {
+		return LastCompletedDate;
+	}
+
+	public void setLastCompletedDate(String lastCompletedDate) {
+		LastCompletedDate = lastCompletedDate;
+	}
+
+	public String getNextDueDate() {
+		return NextDueDate;
+	}
+
+	public void setNextDueDate(String nextDueDate) {
+		NextDueDate = nextDueDate;
+	}
+
+	public String getNbrDaysNonCompliant() {
+		return NbrDaysNonCompliant;
+	}
+
+	public void setNbrDaysNonCompliant(String nbrDaysNonCompliant) {
+		NbrDaysNonCompliant = nbrDaysNonCompliant;
+	}
+
+	public String getNbrDaysPastDue() {
+		return NbrDaysPastDue;
+	}
+
+	public void setNbrDaysPastDue(String nbrDaysPastDue) {
+		NbrDaysPastDue = nbrDaysPastDue;
+	}
+
+	public String getWeightedOperationalRisk() {
+		return WeightedOperationalRisk;
+	}
+
+	public void setWeightedOperationalRisk(String weightedOperationalRisk) {
+		WeightedOperationalRisk = weightedOperationalRisk;
+	}
+
+	public String getMonthEndWeightedOperationalRisk() {
+		return MonthEndWeightedOperationalRisk;
+	}
+
+	public void setMonthEndWeightedOperationalRisk(String monthEndWeightedOperationalRisk) {
+		MonthEndWeightedOperationalRisk = monthEndWeightedOperationalRisk;
+	}
+
 	public String getCDPAccountManager() {
 		return CDPAccountManager;
 	}
@@ -135,95 +233,7 @@ public class RelatorioOperationalRiskIndexByClient {
 	public void setCDPAccountManager(String cDPAccountManager) {
 		CDPAccountManager = cDPAccountManager;
 	}
-
-	public String getWeightedOperationalRiskCurrent() {
-		return WeightedOperationalRiskCurrent;
-	}
-
-	public void setWeightedOperationalRiskCurrent(String weightedOperationalRiskCurrent) {
-		WeightedOperationalRiskCurrent = weightedOperationalRiskCurrent;
-	}
-
-	public String getWeightedOperationalRiskCurrentColor() {
-		return WeightedOperationalRiskCurrentColor;
-	}
-
-	public void setWeightedOperationalRiskCurrentColor(String weightedOperationalRiskCurrentColor) {
-		WeightedOperationalRiskCurrentColor = weightedOperationalRiskCurrentColor;
-	}
-
-	public String getWeightedOperationalRiskMonthEnd() {
-		return WeightedOperationalRiskMonthEnd;
-	}
-
-	public void setWeightedOperationalRiskMonthEnd(String weightedOperationalRiskMonthEnd) {
-		WeightedOperationalRiskMonthEnd = weightedOperationalRiskMonthEnd;
-	}
-
-	public String getWeightedOperationalRiskMonthEndColor() {
-		return WeightedOperationalRiskMonthEndColor;
-	}
-
-	public void setWeightedOperationalRiskMonthEndColor(String weightedOperationalRiskMonthEndColor) {
-		WeightedOperationalRiskMonthEndColor = weightedOperationalRiskMonthEndColor;
-	}
-
-	public String getControls30DaysPastDue() {
-		return Controls30DaysPastDue;
-	}
-
-	public void setControls30DaysPastDue(String controls30DaysPastDue) {
-		Controls30DaysPastDue = controls30DaysPastDue;
-	}
-
-	public String getControls60DaysPastDue() {
-		return Controls60DaysPastDue;
-	}
-
-	public void setControls60DaysPastDue(String controls60DaysPastDue) {
-		Controls60DaysPastDue = controls60DaysPastDue;
-	}
-
-	public String getNonCompliantControls() {
-		return NonCompliantControls;
-	}
-
-	public void setNonCompliantControls(String nonCompliantControls) {
-		NonCompliantControls = nonCompliantControls;
-	}
-
-	public String getPastDueControls() {
-		return PastDueControls;
-	}
-
-	public void setPastDueControls(String pastDueControls) {
-		PastDueControls = pastDueControls;
-	}
-
-	public String getControlwHighestOperationalRisk() {
-		return ControlwHighestOperationalRisk;
-	}
-
-	public void setControlwHighestOperationalRisk(String controlwHighestOperationalRisk) {
-		ControlwHighestOperationalRisk = controlwHighestOperationalRisk;
-	}
-
-	public String getOperationalRiskScoreOfWorstControl() {
-		return OperationalRiskScoreOfWorstControl;
-	}
-
-	public void setOperationalRiskScoreOfWorstControl(String operationalRiskScoreOfWorstControl) {
-		OperationalRiskScoreOfWorstControl = operationalRiskScoreOfWorstControl;
-	}
-
-	public String getIsImplemented() {
-		return IsImplemented;
-	}
-
-	public void setIsImplemented(String isImplemented) {
-		IsImplemented = isImplemented;
-	}
-
+	
 	public String getDataExtracao() {
 		return dataExtracao;
 	}
@@ -231,4 +241,5 @@ public class RelatorioOperationalRiskIndexByClient {
 	public void setDataExtracao(String dataExtracao) {
 		this.dataExtracao = dataExtracao;
 	}
+
 }

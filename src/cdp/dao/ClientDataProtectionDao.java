@@ -169,19 +169,21 @@ public class ClientDataProtectionDao {
 			 sql += "Account_ISL,                                     ";
 			 sql += "Account_Contract_Manager,                        ";
 			 sql += "CDP_Account_Manager,                             ";
-			 sql += "Weighted_Operational_Risk_Current,               ";
-			 sql += "Weighted_Operational_Risk_Current_Color,         ";
-			 sql += "Weighted_Operational_Risk_Month_End,             ";
-			 sql += "Weighted_Operational_Risk_Month_End_Color,       ";
-			 sql += "Controls_30Days_PastDue,                         ";
-			 sql += "Controls_60Days_PastDue,                         ";
-			 sql += "NonCompliant_Controls,                           ";
-			 sql += "PastDue_Controls,                                ";
-			 sql += "Controlw_Highest_Operational_Risk,               ";
-			 sql += "Operational_Risk_Score_Of_Worst_Control,         ";
-			 sql += "IsImplemented,                                   ";
+			 sql += "CDPControl_ID,                               	  ";
+			 sql += "Control_Name,                                    ";
+			 sql += "Control_Category,                                ";
+			 sql += "Delivery_Location_Source,                        ";
+			 sql += "Control_Owner,                                   ";
+			 sql += "Compliance_Status,                               ";
+			 sql += "Last_Completed_Date,                             ";
+			 sql += "Next_Due_Date,                                   ";
+			 sql += "Nbr_Days_Non_Compliant,                          ";
+			 sql += "Nbr_Days_Past_Due,                               ";
+			 sql += "Weighted_Operational_Risk,                       ";
+			 sql += "Month_End_Weighted_Operational_Risk,			  ";
 			 sql += "Data_Extracao                                    ";
 			 sql +=  ") VALUES (                            	      ";
+			 sql += "?,                                     	      ";
 			 sql += "?,                                     	      ";
 			 sql += "?,                                     	      ";
 			 sql += "?,                                     	      ";
@@ -219,20 +221,20 @@ public class ClientDataProtectionDao {
 			 statement.setString(9, relatorioOperationalRiskIndexByClient.getAccountISL());
 			 statement.setString(10, relatorioOperationalRiskIndexByClient.getAccountContractManager());
 			 statement.setString(11, relatorioOperationalRiskIndexByClient.getCDPAccountManager());
-			 statement.setString(12, relatorioOperationalRiskIndexByClient.getWeightedOperationalRiskCurrent());
-			 statement.setString(13, relatorioOperationalRiskIndexByClient.getWeightedOperationalRiskCurrentColor());
-			 statement.setString(14, relatorioOperationalRiskIndexByClient.getWeightedOperationalRiskMonthEnd());
-			 statement.setString(15, relatorioOperationalRiskIndexByClient.getWeightedOperationalRiskMonthEndColor());
-			 statement.setString(16, relatorioOperationalRiskIndexByClient.getControls30DaysPastDue());
-			 statement.setString(17, relatorioOperationalRiskIndexByClient.getControls60DaysPastDue());
-			 statement.setString(18, relatorioOperationalRiskIndexByClient.getNonCompliantControls());
-			 statement.setString(19, relatorioOperationalRiskIndexByClient.getPastDueControls());
-			 statement.setString(20, relatorioOperationalRiskIndexByClient.getControlwHighestOperationalRisk());
-			 statement.setString(21, relatorioOperationalRiskIndexByClient.getOperationalRiskScoreOfWorstControl());
-			 statement.setString(22, relatorioOperationalRiskIndexByClient.getIsImplemented());
-			 statement.setString(23, relatorioOperationalRiskIndexByClient.getDataExtracao());
+			 statement.setString(12, relatorioOperationalRiskIndexByClient.getCDPControlID());
+			 statement.setString(13, relatorioOperationalRiskIndexByClient.getControlName());
+			 statement.setString(14, relatorioOperationalRiskIndexByClient.getControlCategory());
+			 statement.setString(15, relatorioOperationalRiskIndexByClient.getDeliveryLocationSource());
+			 statement.setString(16, relatorioOperationalRiskIndexByClient.getControlOwner());
+			 statement.setString(17, relatorioOperationalRiskIndexByClient.getComplianceStatus());
+			 statement.setString(18, relatorioOperationalRiskIndexByClient.getLastCompletedDate());
+			 statement.setString(19, relatorioOperationalRiskIndexByClient.getNextDueDate());
+			 statement.setString(20, relatorioOperationalRiskIndexByClient.getNbrDaysNonCompliant());
+			 statement.setString(21, relatorioOperationalRiskIndexByClient.getNbrDaysPastDue());
+			 statement.setString(22, relatorioOperationalRiskIndexByClient.getWeightedOperationalRisk());
+			 statement.setString(23, relatorioOperationalRiskIndexByClient.getMonthEndWeightedOperationalRisk());
+			 statement.setString(24, relatorioOperationalRiskIndexByClient.getDataExtracao());
 
-			 
 			 statement.executeUpdate();
 			 
 			 if (statement != null) {

@@ -51,8 +51,8 @@ public class AutomacaoClientDataProtection {
 	private static String dataAtual = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss").format(new Date());
 	private static String dataAtualPlanilhaFinal = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 	private static String diretorioLogs = "";
-	private static List<RelatorioControlsDueThisMonth> listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
-	private static List<RelatorioOperationalRiskIndexByClient> listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
+	private static List<RelatorioControlsDueThisMonth> listaRelatorioControlsDueThisMonth;
+	private static List<RelatorioOperationalRiskIndexByClient> listaRelatorioOperationalRiskIndexByClient;
 	
 	private static int contadorErroslerRelatorioExcel = 0;
 	private static int contadorExecutaAutomacaoClientDataProtection = 0;
@@ -98,6 +98,9 @@ public class AutomacaoClientDataProtection {
     	
     	try {
     		
+    		listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
+    		listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
+    		
     		// Deleto arquivos que existirem no diretorio de relatorios
     		Util.apagaArquivosDiretorioDeRelatorios(Util.getValor("caminho.download.relatorios"));
     		
@@ -139,14 +142,14 @@ public class AutomacaoClientDataProtection {
     		fazerDownloadRelatorioOperationalRiskIndexByClient(driver, wait, js,  nomeRelatorioOperationalRiskIndexByClient);
     		
     		// Lê o relatório Controls Due This Month
-    		lerRelatorioControlsDueThisMonth(subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados);
+    		lerRelatorioControlsDueThisMonth(subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados, listaRelatorioControlsDueThisMonth);
+    		
+    		// Lê o relatório Operational Risk Index By Client
+    		lerRelatorioOperationalRiskIndexByClient(subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioOperationalRiskIndexByClient, subdiretorioRelatoriosBaixados, listaRelatorioOperationalRiskIndexByClient);
     		
     		// Deleto o que estiver na tabela CDP_Controls_Due e gravo o relatório Controls Due This Month na mesma tabela
     		deletaEInsereRelatorioControlsDueThisMonthNoBanco();
-    		
-    		// Lê o relatório Operational Risk Index By Client
-    		lerRelatorioOperationalRiskIndexByClient(subdiretorioRelatoriosBaixados2 + "/" + nomeRelatorioOperationalRiskIndexByClient, subdiretorioRelatoriosBaixados);
-    		
+
     		// Deleto o que estiver na tabela CDP_Operational_Risc e gravo o relatório Operational Risk Index By Client na mesma tabela
     		deletaEInsereRelatorioOperationalRiskIndexByClient();
     		
@@ -229,6 +232,7 @@ public class AutomacaoClientDataProtection {
     	
     	// Clicando no item Operational Risk Index Report do menu
     	String textoOperationalRiskIndexReport = "Operational Risk Index Report";
+    	
     	wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//li [text()='"+textoOperationalRiskIndexReport+"']"))).click();
     	
     	// Não consegui interagir com nenhum elemento da página do relatório usando o Selenium
@@ -251,17 +255,17 @@ public class AutomacaoClientDataProtection {
     		
     		// Digita o e-mail
     		rob.datilografar(Util.getValor("username"));
-    		Thread.sleep(1000);
+    		Thread.sleep(500);
+
+    		// Apertando o tab 1 vez para chegar na senha
+    		robo.keyPress(KeyEvent.VK_TAB);
+    		robo.keyRelease(KeyEvent.VK_TAB);
     	
     	}
 
     	if ("S".equals(Util.getValor("digita.automaticamente.senha"))) {
     		Thread.sleep(3000);
-    		// Apertando o tab 1 vez para chegar na senha
-    		robo.keyPress(KeyEvent.VK_TAB);
-    		robo.keyRelease(KeyEvent.VK_TAB);
     		//robo.delay(1500);
-    		Thread.sleep(1000);
     		
     		// Digita a senha
     		rob.datilografar(Util.getValor("senha"));
@@ -397,7 +401,7 @@ public class AutomacaoClientDataProtection {
     }
 
     @SuppressWarnings("resource")
-	public static void lerRelatorioControlsDueThisMonth(String relatorio, String subdiretorioRelatoriosBaixados) throws Exception {
+	public static void lerRelatorioControlsDueThisMonth(String relatorio, String subdiretorioRelatoriosBaixados, List<RelatorioControlsDueThisMonth> listaRelatorioControlsDueThisMonth) throws Exception {
 
         try {
                FileInputStream arquivo = new FileInputStream(new File(
@@ -487,7 +491,11 @@ public class AutomacaoClientDataProtection {
 		        	   // Data Extracao
 		        	    relatorioControlsDueThisMonth.setDataExtracao(dataAtualPlanilhaFinal);
 		        	    
-		        	    listaRelatorioControlsDueThisMonth.add(relatorioControlsDueThisMonth);
+		        	    
+		        	    if (relatorioControlsDueThisMonth != null && relatorioControlsDueThisMonth.getControlID() != null && !relatorioControlsDueThisMonth.getControlID().isEmpty()) {
+		        	    	listaRelatorioControlsDueThisMonth.add(relatorioControlsDueThisMonth);
+		        	    }
+
             		   
             	   }
             	   arquivo.close();
@@ -503,7 +511,7 @@ public class AutomacaoClientDataProtection {
             if (contadorErroslerRelatorioExcel <= 3) {
             	
 				System.out.println("Deu erro no metodo lerRelatorioControlsDueThisMonth, tentativa de acerto: " + contadorErroslerRelatorioExcel);
-         	    lerRelatorioControlsDueThisMonth(relatorio, subdiretorioRelatoriosBaixados);
+         	    lerRelatorioControlsDueThisMonth(relatorio, subdiretorioRelatoriosBaixados, listaRelatorioControlsDueThisMonth);
             
             } else {
          	   throw new Exception("Arquivo Excel nao encontrado! : " + e);
@@ -513,7 +521,7 @@ public class AutomacaoClientDataProtection {
   }
     
     @SuppressWarnings("resource")
-	public static void lerRelatorioOperationalRiskIndexByClient(String relatorio, String subdiretorioRelatoriosBaixados) throws Exception {
+	public static void lerRelatorioOperationalRiskIndexByClient(String relatorio, String subdiretorioRelatoriosBaixados, List<RelatorioOperationalRiskIndexByClient> listaRelatorioOperationalRiskIndexByClient) throws Exception {
 
         try {
                FileInputStream arquivo = new FileInputStream(new File(
@@ -527,7 +535,7 @@ public class AutomacaoClientDataProtection {
             	   
             	   XSSFWorkbook workbook = new XSSFWorkbook(pkg);
             	   
-            	   XSSFSheet sheetPedidos =  workbook.getSheetAt(0);
+            	   XSSFSheet sheetPedidos =  workbook.getSheetAt(1);
             	   
             	   Iterator<Row> rowIterator = sheetPedidos.iterator();
             	   
@@ -537,7 +545,7 @@ public class AutomacaoClientDataProtection {
             		   
             		   Row row = rowIterator.next();
             		   
-            		   if (row.getRowNum() == 0 || row.getRowNum() == 1 || row.getRowNum() == 2) {
+            		   if (row.getRowNum() == 0) {
             			   continue;
             		   }
             		   
@@ -546,6 +554,17 @@ public class AutomacaoClientDataProtection {
         			   
         			   while (cellIterator.hasNext()) {
         				   Cell cell = cellIterator.next();
+        				   
+        				   // Na última linha do relatório existe a frase: Accenture Highly Confidential.  Copyright ©2022
+        				   // Daí dá erro porque estou tratando a célula com o cell.getNumericCellValue() e como é uma sequência de caracteres, dá erro.
+        				   // Então ignoro esse erro, pois sei que é só uma frase que está ao final do arquivo
+        				   if (cell.getColumnIndex() == 0) {
+        					   try {
+        						   String cDPTrackerID = String.valueOf(cell.getNumericCellValue());
+        					   } catch (Exception e) {
+        						   continue;
+        					   }
+        				   }
         				   
         				   switch (cell.getColumnIndex()) {
         				   case 0:
@@ -582,37 +601,40 @@ public class AutomacaoClientDataProtection {
         					   relatorioOperationalRiskIndexByClient.setCDPAccountManager(cell.getStringCellValue());
         					   break;
         				   case 11:
-        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskCurrent(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexByClient.setCDPControlID(String.valueOf(cell.getNumericCellValue()));
         					   break;       
         				   case 12:
-        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskCurrentColor(cell.getStringCellValue());
+        					   relatorioOperationalRiskIndexByClient.setControlName(cell.getStringCellValue());
         					   break;
         				   case 13:
-        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskMonthEnd(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexByClient.setControlCategory(cell.getStringCellValue());
         					   break;
         				   case 14:
-        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRiskMonthEndColor(cell.getStringCellValue());
+        					   relatorioOperationalRiskIndexByClient.setDeliveryLocationSource(cell.getStringCellValue());
         					   break;
         				   case 15:
-        					   relatorioOperationalRiskIndexByClient.setControls30DaysPastDue(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexByClient.setControlOwner(cell.getStringCellValue());
         					   break;
         				   case 16:
-        					   relatorioOperationalRiskIndexByClient.setControls60DaysPastDue(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexByClient.setComplianceStatus(cell.getStringCellValue());
         					   break;
         				   case 17:
-        					   relatorioOperationalRiskIndexByClient.setNonCompliantControls(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexByClient.setLastCompletedDate(cell.getStringCellValue());
         					   break;       
         				   case 18:
-        					   relatorioOperationalRiskIndexByClient.setPastDueControls(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexByClient.setNextDueDate(cell.getStringCellValue());
         					   break;
         				   case 19:
-        					   relatorioOperationalRiskIndexByClient.setControlwHighestOperationalRisk(cell.getStringCellValue());
+        					   relatorioOperationalRiskIndexByClient.setNbrDaysNonCompliant(String.valueOf(cell.getNumericCellValue()));
         					   break;
         				   case 20:
-        					   relatorioOperationalRiskIndexByClient.setOperationalRiskScoreOfWorstControl(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexByClient.setNbrDaysPastDue(String.valueOf(cell.getNumericCellValue()));
         					   break;
         				   case 21:
-        					   relatorioOperationalRiskIndexByClient.setIsImplemented(cell.getStringCellValue());
+        					   relatorioOperationalRiskIndexByClient.setWeightedOperationalRisk(String.valueOf(cell.getNumericCellValue()));
+        					   break;
+        				   case 22:
+        					   relatorioOperationalRiskIndexByClient.setMonthEndWeightedOperationalRisk(String.valueOf(cell.getNumericCellValue()));
         					   break;
         					   
         				   }
@@ -622,7 +644,9 @@ public class AutomacaoClientDataProtection {
 		        	   // Data Extracao
 		        	    relatorioOperationalRiskIndexByClient.setDataExtracao(dataAtualPlanilhaFinal);
 		        	    
-		        	    listaRelatorioOperationalRiskIndexByClient.add(relatorioOperationalRiskIndexByClient);
+		        	    if (relatorioOperationalRiskIndexByClient != null && relatorioOperationalRiskIndexByClient.getCDPTrackerID() != null && !relatorioOperationalRiskIndexByClient.getCDPTrackerID().isEmpty()) {
+		        	    	listaRelatorioOperationalRiskIndexByClient.add(relatorioOperationalRiskIndexByClient);
+		        	    }
             		   
             	   }
             	   arquivo.close();
@@ -638,7 +662,7 @@ public class AutomacaoClientDataProtection {
             if (contadorErroslerRelatorioExcel <= 3) {
             	
 				System.out.println("Deu erro no metodo lerRelatorioOperationalRiskIndexByClient, tentativa de acerto: " + contadorErroslerRelatorioExcel);
-				lerRelatorioOperationalRiskIndexByClient(relatorio, subdiretorioRelatoriosBaixados);
+				lerRelatorioOperationalRiskIndexByClient(relatorio, subdiretorioRelatoriosBaixados, listaRelatorioOperationalRiskIndexByClient);
             
             } else {
          	   throw new Exception("Arquivo Excel nao encontrado! : " + e);
