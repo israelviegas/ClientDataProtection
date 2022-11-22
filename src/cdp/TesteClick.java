@@ -24,7 +24,10 @@ public class TesteClick {
 		
    		listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
 		listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
+		
+		StringBuilder s =(new StringBuilder()).append("Sachin").append("Tendulkar");  
 
+		System.out.println(s);
 		
 		AutomacaoClientDataProtection obj = new AutomacaoClientDataProtection();
 		

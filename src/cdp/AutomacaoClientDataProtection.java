@@ -313,7 +313,7 @@ public class AutomacaoClientDataProtection {
     	Robot robot = new Robot();
  //   	robot.mouseMove(0, 0); 
     	
-    	Thread.sleep(40000);
+    	Thread.sleep(30000);
     	// Apertando o tab 6 vezes até chegar no botão de salvar
     	for (int i = 1; i <= 6; i++) {
     		robot.keyPress(KeyEvent.VK_TAB);
@@ -336,7 +336,7 @@ public class AutomacaoClientDataProtection {
     	// Enter no botão de gerar relatório em excel
     	robot.keyPress(KeyEvent.VK_ENTER);
     	robot.keyRelease(KeyEvent.VK_ENTER);
-    	Thread.sleep(40000);
+    	Thread.sleep(30000);
     	
         /*
     	Robot bot = new Robot();
@@ -350,20 +350,13 @@ public class AutomacaoClientDataProtection {
     	
     	if (listaRelatorioControlsDueThisMonth != null && !listaRelatorioControlsDueThisMonth.isEmpty()) {
     		
-    		int contador = 0;
-    		
     		ClientDataProtectionDao deletarClientDataProtectionDao = new ClientDataProtectionDao();
     		// Deleto o que estiver na tabela CDP_Controls_Due
     		deletarClientDataProtectionDao.deletarRelatorioControlsDueThisMonth();
     		System.out.println("Relatorio Controls Due This Month. Apaguei todos os dados do banco");
 
-    		for (RelatorioControlsDueThisMonth relatorioControlsDueThisMonth : listaRelatorioControlsDueThisMonth) {
-    			ClientDataProtectionDao inserirClientDataProtectionDao = new ClientDataProtectionDao();
-    			inserirClientDataProtectionDao.inserirRelatorioControlsDueThisMonth(relatorioControlsDueThisMonth);
-    			contador++;
-    			System.out.println("Relatorio Controls Due This Month. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioControlsDueThisMonth.size());
-    			
-    		}
+    		ClientDataProtectionDao inserirClientDataProtectionDao = new ClientDataProtectionDao();
+    		inserirClientDataProtectionDao.inserirRelatorioControlsDueThisMonth(listaRelatorioControlsDueThisMonth);
     		
     	} else {
     		
@@ -377,20 +370,13 @@ public class AutomacaoClientDataProtection {
     	
     	if (listaRelatorioOperationalRiskIndexByClient != null && !listaRelatorioOperationalRiskIndexByClient.isEmpty()) {
     		
-    		int contador = 0;
-    		
     		ClientDataProtectionDao deletarClientDataProtectionDao = new ClientDataProtectionDao();
     		// Deleto o que estiver na tabela CDP_Operational_Risc
     		deletarClientDataProtectionDao.deletarRelatorioOperationalRiskIndexByClient();
     		System.out.println("Relatorio Operational Risk Index By Client. Apaguei todos os dados do banco");
 
-    		for (RelatorioOperationalRiskIndexByClient relatorioOperationalRiskIndexByClient : listaRelatorioOperationalRiskIndexByClient) {
-    			ClientDataProtectionDao inserirClientDataProtectionDao = new ClientDataProtectionDao();
-    			inserirClientDataProtectionDao.inserirRelatorioOperationalRiskIndexByClient(relatorioOperationalRiskIndexByClient);
-    			contador++;
-    			System.out.println("Relatorio Operational Risk Index By Client. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioOperationalRiskIndexByClient.size());
-    			
-    		}
+    		ClientDataProtectionDao inserirClientDataProtectionDao = new ClientDataProtectionDao();
+    		inserirClientDataProtectionDao.inserirRelatorioOperationalRiskIndexByClient(listaRelatorioOperationalRiskIndexByClient);
     		
     	} else {
     		
@@ -767,10 +753,7 @@ public class AutomacaoClientDataProtection {
 					System.setProperty(Util.getValor("propriedade.binario.Firefox.selenium"),Util.getValor("binario.Firefox")); 
 					System.setProperty(Util.getValor("propriedade.sistema.para.driver.Firefox.selenium"),file.getAbsolutePath());
      				File profileDirectory = new File(Util.getValor("caminho.dados.usuario.Firefox"));
-				    //FirefoxProfile fxProfile = new FirefoxProfile(profileDirectory);
-     				// Viegas
-     				//Na minha máquina só funciona assim
-     				FirefoxProfile fxProfile = new FirefoxProfile();
+     				FirefoxProfile fxProfile = new FirefoxProfile(profileDirectory);
 				    fxProfile.setPreference("browser.download.folderList",2);
 				    fxProfile.setPreference("browser.download.manager.showWhenStarting",false);
 				    fxProfile.setPreference("browser.download.dir",Util.getValor("caminho.download.relatorios"));
@@ -787,7 +770,7 @@ public class AutomacaoClientDataProtection {
 				    FirefoxOptions fxOptions = new FirefoxOptions();
 				    fxOptions.setProfile(fxProfile);
 				    driver = new FirefoxDriver(fxOptions);
-				    // Limpa o cache usando m�]etodo do driver
+				    // Limpa o cache usando m�todo do driver
 				    driver.manage().deleteAllCookies();
 				}
 			
