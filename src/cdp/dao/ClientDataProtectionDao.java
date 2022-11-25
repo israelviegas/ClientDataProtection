@@ -10,6 +10,7 @@ import cdp.util.ConnectionFactory;
 import cdp.util.Util;
 
 import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -71,6 +72,53 @@ public class ClientDataProtectionDao {
 		 }
 		 
 	 }
+	 
+	 public void inserirLeftJoin_ControlDue_OperacionalRisc() throws SQLException, IOException {
+		 
+		 CallableStatement cs = null;
+		 String retorno;
+		 
+		 try {
+			 
+			    // Prepara a chamada
+			    cs = connection.prepareCall("{call Insere_LeftJoin_ControlDue_OperacionalRisc()}");
+
+			    // Registra um parametro
+			    //cs.registerOutParameter(1, Types.VARCHAR);
+
+			    // passa o parametro
+			    //cs.setString(1, "a string");  
+
+			    // executa a procedure
+			    cs.execute();	
+			    
+			    // obtem o retorno
+			    //retorno = cs.getString(1);
+			 
+		 } catch (SQLException e) {
+			 
+			 String mensagem = e.getMessage() + "\n";
+			 
+			 if (mensagem.contains("String or binary data would be truncated")) {
+				 
+				 mensagem += "A mensagem acima - String or binary data would be truncated - significa que algum campo do registro estourou o limite de tamanho permitido para o seu respectivo campo na tabela do banco." ;
+			 }
+			 
+			 throw new RuntimeException(mensagem);
+		 
+		 } finally {
+			 
+			 if (cs != null) {
+				 cs.close();
+			 }
+			 if (this.connection != null) {
+				 this.connection.close();
+			 }
+
+		 }
+		 
+	 }
+
 
 	 public void inserirRelatorioControlsDueThisMonth(RelatorioControlsDueThisMonth relatorioControlsDueThisMonth) throws SQLException, IOException {
 		 

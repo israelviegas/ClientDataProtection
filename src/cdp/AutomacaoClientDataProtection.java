@@ -155,6 +155,11 @@ public class AutomacaoClientDataProtection {
     		
     		Util.gravarArquivo(diretorioLogs, "Sucesso ClientDataProtection" + " " + dataAtual, ".txt", "", mensagemResultadoClientDataProtection);
     		
+    		//Executa a procedure Insere_LeftJoin_ControlDue_OperacionalRisc que realiza o join entre as tabelas CDP_Controls_Due e CDP_Operational_Risc
+    		// e insere na tabela LeftJoin_ControlDue_OperacionalRisc
+    		ClientDataProtectionDao inserirClientDataProtectionDao = new ClientDataProtectionDao();
+    		inserirClientDataProtectionDao.inserirLeftJoin_ControlDue_OperacionalRisc();
+    		
     		// Grava na tabela Tb_Historico_Execucao_Robos o servico, data e hora e status da execucao
     		inserirStatusExecucaoNoBanco("ClientDataProtection", dataAtualPlanilhaFinal, "Sucesso");
     		
@@ -770,7 +775,7 @@ public class AutomacaoClientDataProtection {
 				    FirefoxOptions fxOptions = new FirefoxOptions();
 				    fxOptions.setProfile(fxProfile);
 				    driver = new FirefoxDriver(fxOptions);
-				    // Limpa o cache usando m�todo do driver
+				    // Limpa o cache usando metodo do driver
 				    driver.manage().deleteAllCookies();
 				}
 			

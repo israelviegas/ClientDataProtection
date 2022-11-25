@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import bean.RelatorioControlsDueThisMonth;
 import bean.RelatorioOperationalRiskIndexByClient;
+import cdp.dao.ClientDataProtectionDao;
 
 public class TesteClick {
 	
@@ -24,6 +25,10 @@ public class TesteClick {
 		
    		listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
 		listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
+		
+		ClientDataProtectionDao testeClientDataProtectionDao = new ClientDataProtectionDao();
+		
+		testeClientDataProtectionDao.inserirLeftJoin_ControlDue_OperacionalRisc();
 		
 		StringBuilder s =(new StringBuilder()).append("Sachin").append("Tendulkar");  
 
