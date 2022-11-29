@@ -16,6 +16,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import cdp.AutomacaoClientDataProtection;
+
 
 public class Util {
 	
@@ -143,22 +145,6 @@ public class Util {
 		        
 		        if (!sucesso) {
 		        	throw new Exception("Nao existe o diretorio: " + caminhoDiretorio);
-		        }
-		        
-		    }
-		  
-		   public static void moverArquivosEntreDiretorios(String caminhoArquivoOrigem, String caminhoDiretorioDestino) throws Exception{
-		    	
-		    	boolean sucesso = true;
-		    	File arquivoOrigem = new File(caminhoArquivoOrigem);
-		        File diretorioDestino = new File(caminhoDiretorioDestino);
-		        if (arquivoOrigem.exists() && diretorioDestino.exists()) {
-		        	sucesso = arquivoOrigem.renameTo(new File(diretorioDestino, arquivoOrigem.getName()));
-		        }
-		        
-		        if (!sucesso) {
-		        	throw new Exception("Ocorreu um erro no momento de mover o relat�rio " + caminhoArquivoOrigem + " para " + caminhoDiretorioDestino);
-		        	
 		        }
 		        
 		    }

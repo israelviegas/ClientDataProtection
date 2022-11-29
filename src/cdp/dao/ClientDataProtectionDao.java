@@ -94,6 +94,8 @@ public class ClientDataProtectionDao {
 			    
 			    // obtem o retorno
 			    //retorno = cs.getString(1);
+			    
+			    System.out.println("Executei a procedure Insere_LeftJoin_ControlDue_OperacionalRisc que insere o join das tabelas CDP_Controls_Due e CDP_Operational_Risc na tabela LeftJoin_ControlDue_OperacionalRisc");
 			 
 		 } catch (SQLException e) {
 			 

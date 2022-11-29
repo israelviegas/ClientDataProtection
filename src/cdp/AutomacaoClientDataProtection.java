@@ -56,6 +56,7 @@ public class AutomacaoClientDataProtection {
 	
 	private static int contadorErroslerRelatorioExcel = 0;
 	private static int contadorExecutaAutomacaoClientDataProtection = 0;
+	private static int contadorErrosTabsRelatorios = 0;
 	private static String subdiretorioRelatoriosBaixados = null;
 	private static String subdiretorioRelatoriosBaixados2 = null;
 	
@@ -100,6 +101,7 @@ public class AutomacaoClientDataProtection {
     		
     		listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
     		listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
+    		contadorErrosTabsRelatorios = 0;
     		
     		// Deleto arquivos que existirem no diretorio de relatorios
     		Util.apagaArquivosDiretorioDeRelatorios(Util.getValor("caminho.download.relatorios"));
@@ -174,7 +176,7 @@ public class AutomacaoClientDataProtection {
 			
 		} catch (Exception e) {
 			contadorExecutaAutomacaoClientDataProtection ++;
-			// Executo ate 5 vezes se der erro no executaAutomacaoAdquiraSharepoint
+			// Executo ate 3 vezes se der erro no executaAutomacaoAdquiraSharepoint
 			if (contadorExecutaAutomacaoClientDataProtection <= 3) {
 				
 				System.out.println("Deu erro no metodo executaAutomacaoClientDataProtection, tentativa de acerto: " + contadorExecutaAutomacaoClientDataProtection);
@@ -187,6 +189,35 @@ public class AutomacaoClientDataProtection {
 		}
     	
     }
+    
+	   public static void moverArquivosEntreDiretorios(String caminhoArquivoOrigem, String caminhoDiretorioDestino, String nomeRelatorio) throws Exception{
+	    	
+	    	boolean sucesso = false;
+	    	File arquivoOrigem = new File(caminhoArquivoOrigem);
+	        File diretorioDestino = new File(caminhoDiretorioDestino);
+	        if (arquivoOrigem.exists() && diretorioDestino.exists()) {
+	        	sucesso = arquivoOrigem.renameTo(new File(diretorioDestino, arquivoOrigem.getName()));
+	        }
+	        
+	        if (!sucesso) {
+	        	contadorErrosTabsRelatorios++;
+	        	// O arquivo pode nao ter sido encontrado.
+	        	// Isso pode ocorrer por conta do numeros de tabs que foram dados no relatorio.
+	        	// Se o relatorio tiver mais que uma pagina, deveremos dar 6 tabs.
+	        	// Se nao, deveremos dar 4 tabs
+	        	// Então no caso de ter somente uma pagina, chamo a função de salvar o relatorio novamente
+	        	// passando como parameto o numero 4 de tabs
+	        	// Executo ate 2 vezes, uma para cada relatorio.Se der erro mais que duas vezes, retorno exception
+	        	if (contadorErrosTabsRelatorios <=2) {
+	        		System.out.println("Deu erro no metodo moverArquivosEntreDiretorios.Possivel problema do numero de tabs. Tentativa de acerto: " + contadorErrosTabsRelatorios);
+	        		salvaRelatorio(4, nomeRelatorio);
+	        	} else {
+	        		throw new Exception("Ocorreu um erro no momento de mover o relatorio " + caminhoArquivoOrigem + " para " + caminhoDiretorioDestino);
+	        	}
+	        	
+	        }
+	        
+	    }
     
     public static void acessarClientDataProtection(WebDriver driver, WebDriverWait wait, JavascriptExecutor js) throws Exception {
 
@@ -218,13 +249,7 @@ public class AutomacaoClientDataProtection {
     	// Digitando o usuário e senha com o Robot
     	digitarUsuarioSenha();
     	
-    	// Não consegui interagir com nenhum elemento da página do relatório usando o Selenium
-    	// Tive que apelar para o Robot ;)
-    	clickBotaoSalvarRelatorio();
-    	
-    	//Move o excel baixado do diretorio relatorios para o diretorio correto
-    	Util.moverArquivosEntreDiretorios(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados);
-    	Thread.sleep(1000);
+    	salvaRelatorio(6, nomeRelatorioControlsDueThisMonth);
     	
     }
     
@@ -240,16 +265,21 @@ public class AutomacaoClientDataProtection {
     	
     	wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//li [text()='"+textoOperationalRiskIndexReport+"']"))).click();
     	
+    	salvaRelatorio(6, nomeRelatorioOperationalRiskIndexByClient);    	
+    }
+    
+    public static void salvaRelatorio(int numeroTabs, String nomeRelatorio) throws Exception {
+    	
     	// Não consegui interagir com nenhum elemento da página do relatório usando o Selenium
     	// Tive que apelar para o Robot ;)
-    	clickBotaoSalvarRelatorio();
+    	clickBotaoSalvarRelatorio(numeroTabs);
     	
     	//Move o excel baixado do diretorio relatorios para o diretorio correto
-    	Util.moverArquivosEntreDiretorios(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioOperationalRiskIndexByClient, subdiretorioRelatoriosBaixados);
+    	moverArquivosEntreDiretorios(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorio, subdiretorioRelatoriosBaixados, nomeRelatorio);
     	Thread.sleep(1000);
     	
     }
-    
+
     public static void digitarUsuarioSenha() throws Exception {
     	
     	Robot robo = new Robot();
@@ -313,14 +343,21 @@ public class AutomacaoClientDataProtection {
             	
     }
     
-    public static void clickBotaoSalvarRelatorio() throws Exception {
+    public static void clickBotaoSalvarRelatorio(int repeticoesTab) throws Exception {
     	
     	Robot robot = new Robot();
- //   	robot.mouseMove(0, 0); 
+ //   	robot.mouseMove(0, 0);
+    	
+    	// Se tiver que dar 4 repeticoes é porque o relatorio so tem uma pagina
+    	// Nesse caso, dou um refresh na pagina para o cursor comecar do inicio
+    	if (repeticoesTab  == 4) {
+    		robot.keyPress(KeyEvent.VK_F5);
+    		robot.keyRelease(KeyEvent.VK_F5);
+    	}
     	
     	Thread.sleep(30000);
-    	// Apertando o tab 6 vezes até chegar no botão de salvar
-    	for (int i = 1; i <= 6; i++) {
+    	// Apertando o tab n vezes até chegar no botão de salvar
+    	for (int i = 1; i <= repeticoesTab; i++) {
     		robot.keyPress(KeyEvent.VK_TAB);
     		robot.keyRelease(KeyEvent.VK_TAB);
     		Thread.sleep(1000);
