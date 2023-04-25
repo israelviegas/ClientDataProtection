@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -57,6 +58,7 @@ public class AutomacaoClientDataProtection {
 	private static int contadorErroslerRelatorioExcel = 0;
 	private static int contadorExecutaAutomacaoClientDataProtection = 0;
 	private static int contadorErrosTabsRelatorios = 0;
+	private static int contadorErrosMoverArquivos = 0;
 	private static String subdiretorioRelatoriosBaixados = null;
 	private static String subdiretorioRelatoriosBaixados2 = null;
 	
@@ -130,14 +132,15 @@ public class AutomacaoClientDataProtection {
     		clicarLinkTelefonicaGroup(driver, wait, js);
     		
     		// Faz o download do relatório Controls Due This Month
-    		String nomeRelatorioControlsDueThisMonth = "ControlsDueThisMonth.xlsx";
+    		String nomeRelatorioControlsDueThisMonth = "Controls Due This Month.xlsx";
+    		//fazerDownloadRelatorioControlsDueThisMonth(driver, wait, js, nomeRelatorioControlsDueThisMonth);
     		fazerDownloadRelatorioControlsDueThisMonth(driver, wait, js, nomeRelatorioControlsDueThisMonth);
     		
     		// Acessa o site Client Data Protection na aba original
     		//((JavascriptExecutor) driver).executeScript("window.open()");
-    		List<String> windowHandles = new ArrayList<>(driver.getWindowHandles());
-    		driver.switchTo().window(windowHandles.get(0));
-    		acessarClientDataProtection(driver, wait, js);
+    		//List<String> windowHandles = new ArrayList<>(driver.getWindowHandles());
+    		//driver.switchTo().window(windowHandles.get(0));
+    		//acessarClientDataProtection(driver, wait, js);
     		
     		// Faz o download do relatório Operational Risk Index By Client
     		String nomeRelatorioOperationalRiskIndexByClient = "Operational Risk Index By Client.xlsx";
@@ -218,6 +221,28 @@ public class AutomacaoClientDataProtection {
 	        }
 	        
 	    }
+	   
+	   public static void moverArquivosEntreDiretorios2(String caminhoArquivoOrigem, String caminhoDiretorioDestino, String nomeRelatorio) throws Exception{
+	    	
+	    	boolean sucesso = false;
+	    	File arquivoOrigem = new File(caminhoArquivoOrigem);
+	        File diretorioDestino = new File(caminhoDiretorioDestino);
+	        if (arquivoOrigem.exists() && diretorioDestino.exists()) {
+	        	sucesso = arquivoOrigem.renameTo(new File(diretorioDestino, arquivoOrigem.getName()));
+	        }
+	        if (!sucesso) {
+	        	contadorErrosMoverArquivos++;
+	        	if (contadorErrosMoverArquivos <=3) {
+	        		System.out.println("Deu erro no metodo moverArquivosEntreDiretorios.Possivel problema do numero de tabs. Tentativa de acerto: " + contadorErrosTabsRelatorios);
+	        		moverArquivosEntreDiretorios2(caminhoArquivoOrigem, caminhoDiretorioDestino, nomeRelatorio);
+	        	} else {
+	        		throw new Exception("Ocorreu um erro no momento de mover o relatorio " + caminhoArquivoOrigem + " para " + caminhoDiretorioDestino);
+	        	}
+	        	
+	        }
+	        
+	    }
+
     
     public static void acessarClientDataProtection(WebDriver driver, WebDriverWait wait, JavascriptExecutor js) throws Exception {
 
@@ -247,9 +272,12 @@ public class AutomacaoClientDataProtection {
     	wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span [text()='"+textoControlsDueThisMonth+"']"))).click();
     	
     	// Digitando o usuário e senha com o Robot
-    	digitarUsuarioSenha();
+    	//digitarUsuarioSenha();
     	
-    	salvaRelatorio(6, nomeRelatorioControlsDueThisMonth);
+    	//salvaRelatorio(6, nomeRelatorioControlsDueThisMonth);
+    	Thread.sleep(5000);
+    	moverArquivosEntreDiretorios2(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados, nomeRelatorioControlsDueThisMonth);
+    	Thread.sleep(1000);
     	
     }
     
@@ -257,6 +285,7 @@ public class AutomacaoClientDataProtection {
     	
     	// Clicando no link REPORTS
     	String idReports = "//*[@id=\"oppMobDelTabs\"]/li[2]/span";
+    //	/html/body/form/div[3]/nav/div/div/ul[2]/li[2]/span
     	wait.until(ExpectedConditions.elementToBeClickable(By.xpath(idReports))).click();
     	Thread.sleep(3000);
     	
@@ -264,6 +293,9 @@ public class AutomacaoClientDataProtection {
     	String textoOperationalRiskIndexReport = "Operational Risk Index Report";
     	
     	wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//li [text()='"+textoOperationalRiskIndexReport+"']"))).click();
+    	
+    	// Digitando o usuário e senha com o Robot
+    	digitarUsuarioSenha();
     	
     	salvaRelatorio(6, nomeRelatorioOperationalRiskIndexByClient);    	
     }
@@ -437,6 +469,8 @@ public class AutomacaoClientDataProtection {
                
                File arquivoExcel = new File(relatorio);
                
+               DataFormatter dataFormatter = new DataFormatter();
+               
                if (arquivoExcel.exists() && arquivoExcel.isFile() && arquivoExcel.length() > 0) {
             	   
             	   OPCPackage pkg = OPCPackage.open(new File(relatorio));
@@ -453,7 +487,7 @@ public class AutomacaoClientDataProtection {
             		   
             		   Row row = rowIterator.next();
             		   
-            		   if (row.getRowNum() == 0 || row.getRowNum() == 1) {
+            		   if (row.getRowNum() == 0 || row.getRowNum() == 1 || row.getRowNum() == 2) {
             			   continue;
             		   }
             		   
@@ -480,11 +514,15 @@ public class AutomacaoClientDataProtection {
         					   relatorioControlsDueThisMonth.setIndicator(cell.getStringCellValue());
         					   break;
         				   case 5:
-        					   relatorioControlsDueThisMonth.setNextDueDate(cell.getStringCellValue());
-        					   break;
+        					    // Trazendo data da célula
+        					    String nextDueDate = dataFormatter.formatCellValue(cell);
+        					    relatorioControlsDueThisMonth.setNextDueDate(nextDueDate);
+        					    break;
         				   case 6:
-        					   relatorioControlsDueThisMonth.setVerified(cell.getStringCellValue());
-        					   break;
+        					   // Trazendo data da célula
+	       					    String verified = dataFormatter.formatCellValue(cell);
+	    					    relatorioControlsDueThisMonth.setVerified(verified);
+	    					    break;
         				   case 7:
         					   relatorioControlsDueThisMonth.setDeliveryLocationSource(cell.getStringCellValue());
         					   break;
@@ -573,7 +611,7 @@ public class AutomacaoClientDataProtection {
             		   
             		   Row row = rowIterator.next();
             		   
-            		   if (row.getRowNum() == 0) {
+            		   if (row.getRowNum() == 0 || row.getRowNum() == 1 || row.getRowNum() == 2) {
             			   continue;
             		   }
             		   
