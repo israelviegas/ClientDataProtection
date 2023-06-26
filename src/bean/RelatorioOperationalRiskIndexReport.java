@@ -1,6 +1,6 @@
 package bean;
 
-public class RelatorioOperationalRiskIndexByClient {
+public class RelatorioOperationalRiskIndexReport {
 	
 	String CDPTrackerID;
 

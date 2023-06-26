@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bean.RelatorioControlsDueThisMonth;
-import bean.RelatorioOperationalRiskIndexByClient;
+import bean.RelatorioOperationalRiskIndexReport;
 import cdp.util.ConnectionFactory;
 import cdp.util.Util;
 
@@ -220,63 +220,67 @@ public class ClientDataProtectionDao {
 				 
 				 for (RelatorioControlsDueThisMonth relatorioControlsDueThisMonth : listaRelatorioControlsDueThisMonth) {
 					 
-					 StringBuilder sql =(new StringBuilder()).append("INSERT INTO CDP_Controls_Due (              ")  
-					 .append( "Client_Name,                                 ")
-					 .append( "Control_ID,                                  ")
-					 .append( "Indicator,                                   ")
-					 .append( "Verified,                                    ")
-					 .append( "Service_Name,                                ")
-					 .append( "Client_Data_Protection_Requirement,		    ")
-					 .append( "Related_Contractual_Requirement,             ")
-					 .append( "Regulatory_Requirement,                      ")
-					 .append( "Engagement_Level_Procedure,                  ")
-					 .append( "Compliance,                                  ")
-					 .append( "Ongoing_Frequency,                           ")
-					 .append( "Control_Name,                                ")
-					 .append( "Control_Owner,                               ")
-					 .append( "Next_DueDate,                                ")
-					 .append( "Delivery_Location_Source,                    ")
-					 .append( "Data_Extracao                                ")
-					 .append(  ") VALUES (                                  ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?,                                           ")
-					 .append( "?                                            ")			 
-					 .append( ")");
+					 if (relatorioControlsDueThisMonth !=null) {
+						 
+						 StringBuilder sql =(new StringBuilder()).append("INSERT INTO CDP_Controls_Due (              ")  
+								 .append( "Client_Name,                                 ")
+								 .append( "Control_ID,                                  ")
+								 .append( "Indicator,                                   ")
+								 .append( "Verified,                                    ")
+								 .append( "Service_Name,                                ")
+								 .append( "Client_Data_Protection_Requirement,		    ")
+								 .append( "Related_Contractual_Requirement,             ")
+								 .append( "Regulatory_Requirement,                      ")
+								 .append( "Engagement_Level_Procedure,                  ")
+								 .append( "Compliance,                                  ")
+								 .append( "Ongoing_Frequency,                           ")
+								 .append( "Control_Name,                                ")
+								 .append( "Control_Owner,                               ")
+								 .append( "Next_DueDate,                                ")
+								 .append( "Delivery_Location_Source,                    ")
+								 .append( "Data_Extracao                                ")
+								 .append(  ") VALUES (                                  ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?,                                           ")
+								 .append( "?                                            ")			 
+								 .append( ")");
+						 
+						 statement = this.connection.prepareStatement(sql.toString());
+						 statement.setString(1, relatorioControlsDueThisMonth.getClientName());
+						 statement.setString(2, relatorioControlsDueThisMonth.getControlID());
+						 statement.setString(3, relatorioControlsDueThisMonth.getIndicator());
+						 statement.setString(4, relatorioControlsDueThisMonth.getVerified());
+						 statement.setString(5, relatorioControlsDueThisMonth.getServiceName());
+						 statement.setString(6, relatorioControlsDueThisMonth.getClientDataProtectionRequirement());
+						 statement.setString(7, relatorioControlsDueThisMonth.getRelatedContractualRequirement());
+						 statement.setString(8, relatorioControlsDueThisMonth.getRegulatoryRequirement());
+						 statement.setString(9, relatorioControlsDueThisMonth.getEngagementLevelProcedure());
+						 statement.setString(10, relatorioControlsDueThisMonth.getCompliance());
+						 statement.setString(11, relatorioControlsDueThisMonth.getOngoingFrequency());
+						 statement.setString(12, relatorioControlsDueThisMonth.getControlName());
+						 statement.setString(13, relatorioControlsDueThisMonth.getControlOwner());
+						 statement.setString(14, relatorioControlsDueThisMonth.getNextDueDate());
+						 statement.setString(15, relatorioControlsDueThisMonth.getDeliveryLocationSource());
+						 statement.setString(16, relatorioControlsDueThisMonth.getDataExtracao());
+						 
+						 statement.executeUpdate();
+						 contador++;
+						 System.out.println("Relatorio Controls Due This Month. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioControlsDueThisMonth.size());
+					 }
 					 
-					 statement = this.connection.prepareStatement(sql.toString());
-					 statement.setString(1, relatorioControlsDueThisMonth.getClientName());
-					 statement.setString(2, relatorioControlsDueThisMonth.getControlID());
-					 statement.setString(3, relatorioControlsDueThisMonth.getIndicator());
-					 statement.setString(4, relatorioControlsDueThisMonth.getVerified());
-					 statement.setString(5, relatorioControlsDueThisMonth.getServiceName());
-					 statement.setString(6, relatorioControlsDueThisMonth.getClientDataProtectionRequirement());
-					 statement.setString(7, relatorioControlsDueThisMonth.getRelatedContractualRequirement());
-					 statement.setString(8, relatorioControlsDueThisMonth.getRegulatoryRequirement());
-					 statement.setString(9, relatorioControlsDueThisMonth.getEngagementLevelProcedure());
-					 statement.setString(10, relatorioControlsDueThisMonth.getCompliance());
-					 statement.setString(11, relatorioControlsDueThisMonth.getOngoingFrequency());
-					 statement.setString(12, relatorioControlsDueThisMonth.getControlName());
-					 statement.setString(13, relatorioControlsDueThisMonth.getControlOwner());
-					 statement.setString(14, relatorioControlsDueThisMonth.getNextDueDate());
-					 statement.setString(15, relatorioControlsDueThisMonth.getDeliveryLocationSource());
-					 statement.setString(16, relatorioControlsDueThisMonth.getDataExtracao());
-					 
-					 statement.executeUpdate();
-					 contador++;
-					 System.out.println("Relatorio Controls Due This Month. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioControlsDueThisMonth.size());
 				 }
 				 
 			 }
@@ -305,7 +309,7 @@ public class ClientDataProtectionDao {
 		 
 	 }
 	 
-	 public void inserirRelatorioOperationalRiskIndexByClient(RelatorioOperationalRiskIndexByClient relatorioOperationalRiskIndexByClient) throws SQLException, IOException {
+	 public void inserirRelatorioOperationalRiskIndexByClient(RelatorioOperationalRiskIndexReport relatorioOperationalRiskIndexByClient) throws SQLException, IOException {
 		 
 		 
 		 PreparedStatement statement = null;
@@ -416,7 +420,7 @@ public class ClientDataProtectionDao {
 		 
 	 }
 	 
-	 public void inserirRelatorioOperationalRiskIndexByClient(List<RelatorioOperationalRiskIndexByClient> listaRelatorioOperationalRiskIndexByClient) throws SQLException, IOException {
+	 public void inserirRelatorioOperationalRiskIndexByClient(List<RelatorioOperationalRiskIndexReport> listaRelatorioOperationalRiskIndexByClient) throws SQLException, IOException {
 		 
 		 PreparedStatement statement = null;
 		 int contador = 0;
@@ -425,89 +429,92 @@ public class ClientDataProtectionDao {
 			 
 			 if (listaRelatorioOperationalRiskIndexByClient != null && !listaRelatorioOperationalRiskIndexByClient.isEmpty()) {
 				 
-				 for (RelatorioOperationalRiskIndexByClient relatorioOperationalRiskIndexByClient : listaRelatorioOperationalRiskIndexByClient) {
+				 for (RelatorioOperationalRiskIndexReport relatorioOperationalRiskIndexByClient : listaRelatorioOperationalRiskIndexByClient) {
 					 
-					 StringBuilder sql =(new StringBuilder()).append("INSERT INTO CDP_Operational_Risc (              ")
-					 .append( "CDPTracker_ID,                                 ")
-					 .append( "Client_Name,                                   ")
-					 .append( "Tier,                                          ")
-					 .append( "Master_Customer_Nbr,                           ")
-					 .append( "Market,                                        ")
-					 .append( "Market_Unit,                                   ")
-					 .append( "Owning_Organization,                           ")
-					 .append( "Accountable_MD,                                ")
-					 .append( "Account_ISL,                                   ")
-					 .append( "Account_Contract_Manager,                      ")
-					 .append( "CDP_Account_Manager,                           ")
-					 .append( "CDPControl_ID,                                 ")
-					 .append( "Control_Name,                                  ")
-					 .append( "Control_Category,                              ")
-					 .append( "Delivery_Location_Source,                      ")
-					 .append( "Control_Owner,                                 ")
-					 .append( "Compliance_Status,                             ")
-					 .append( "Last_Completed_Date,                           ")
-					 .append( "Next_Due_Date,                                 ")
-					 .append( "Nbr_Days_Non_Compliant,                        ")
-					 .append( "Nbr_Days_Past_Due,                             ")
-					 .append( "Weighted_Operational_Risk,                     ")
-					 .append( "Month_End_Weighted_Operational_Risk,			  ")
-					 .append( "Data_Extracao                                  ")
-					 .append(  ") VALUES (                            	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?,                                     	      ")
-					 .append( "?                                      	      ")			 
-					 .append( ")");
-					 
-					 statement = this.connection.prepareStatement(sql.toString());
-					 statement.setString(1, relatorioOperationalRiskIndexByClient.getCDPTrackerID());
-					 statement.setString(2, relatorioOperationalRiskIndexByClient.getClientName());
-					 statement.setString(3, relatorioOperationalRiskIndexByClient.getTier());
-					 statement.setString(4, relatorioOperationalRiskIndexByClient.getMasterCustomerNbr());
-					 statement.setString(5, relatorioOperationalRiskIndexByClient.getMarket());
-					 statement.setString(6, relatorioOperationalRiskIndexByClient.getMarketUnit());
-					 statement.setString(7, relatorioOperationalRiskIndexByClient.getOwningOrganization());
-					 statement.setString(8, relatorioOperationalRiskIndexByClient.getAccountableMD());
-					 statement.setString(9, relatorioOperationalRiskIndexByClient.getAccountISL());
-					 statement.setString(10, relatorioOperationalRiskIndexByClient.getAccountContractManager());
-					 statement.setString(11, relatorioOperationalRiskIndexByClient.getCDPAccountManager());
-					 statement.setString(12, relatorioOperationalRiskIndexByClient.getCDPControlID());
-					 statement.setString(13, relatorioOperationalRiskIndexByClient.getControlName());
-					 statement.setString(14, relatorioOperationalRiskIndexByClient.getControlCategory());
-					 statement.setString(15, relatorioOperationalRiskIndexByClient.getDeliveryLocationSource());
-					 statement.setString(16, relatorioOperationalRiskIndexByClient.getControlOwner());
-					 statement.setString(17, relatorioOperationalRiskIndexByClient.getComplianceStatus());
-					 statement.setString(18, relatorioOperationalRiskIndexByClient.getLastCompletedDate());
-					 statement.setString(19, relatorioOperationalRiskIndexByClient.getNextDueDate());
-					 statement.setString(20, relatorioOperationalRiskIndexByClient.getNbrDaysNonCompliant());
-					 statement.setString(21, relatorioOperationalRiskIndexByClient.getNbrDaysPastDue());
-					 statement.setString(22, relatorioOperationalRiskIndexByClient.getWeightedOperationalRisk());
-					 statement.setString(23, relatorioOperationalRiskIndexByClient.getMonthEndWeightedOperationalRisk());
-					 statement.setString(24, relatorioOperationalRiskIndexByClient.getDataExtracao());
-					 
-					 statement.executeUpdate();
-					 contador++;
-					 System.out.println("Relatorio Operational Risk Index By Client. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioOperationalRiskIndexByClient.size());
+					 if (relatorioOperationalRiskIndexByClient != null) {
+						 
+						 StringBuilder sql =(new StringBuilder()).append("INSERT INTO CDP_Operational_Risc (              ")
+								 .append( "CDPTracker_ID,                                 ")
+								 .append( "Client_Name,                                   ")
+								 .append( "Tier,                                          ")
+								 .append( "Master_Customer_Nbr,                           ")
+								 .append( "Market,                                        ")
+								 .append( "Market_Unit,                                   ")
+								 .append( "Owning_Organization,                           ")
+								 .append( "Accountable_MD,                                ")
+								 .append( "Account_ISL,                                   ")
+								 .append( "Account_Contract_Manager,                      ")
+								 .append( "CDP_Account_Manager,                           ")
+								 .append( "CDPControl_ID,                                 ")
+								 .append( "Control_Name,                                  ")
+								 .append( "Control_Category,                              ")
+								 .append( "Delivery_Location_Source,                      ")
+								 .append( "Control_Owner,                                 ")
+								 .append( "Compliance_Status,                             ")
+								 .append( "Last_Completed_Date,                           ")
+								 .append( "Next_Due_Date,                                 ")
+								 .append( "Nbr_Days_Non_Compliant,                        ")
+								 .append( "Nbr_Days_Past_Due,                             ")
+								 .append( "Weighted_Operational_Risk,                     ")
+								 .append( "Month_End_Weighted_Operational_Risk,			  ")
+								 .append( "Data_Extracao                                  ")
+								 .append(  ") VALUES (                            	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?,                                     	      ")
+								 .append( "?                                      	      ")			 
+								 .append( ")");
+						 
+						 statement = this.connection.prepareStatement(sql.toString());
+						 statement.setString(1, relatorioOperationalRiskIndexByClient.getCDPTrackerID());
+						 statement.setString(2, relatorioOperationalRiskIndexByClient.getClientName());
+						 statement.setString(3, relatorioOperationalRiskIndexByClient.getTier());
+						 statement.setString(4, relatorioOperationalRiskIndexByClient.getMasterCustomerNbr());
+						 statement.setString(5, relatorioOperationalRiskIndexByClient.getMarket());
+						 statement.setString(6, relatorioOperationalRiskIndexByClient.getMarketUnit());
+						 statement.setString(7, relatorioOperationalRiskIndexByClient.getOwningOrganization());
+						 statement.setString(8, relatorioOperationalRiskIndexByClient.getAccountableMD());
+						 statement.setString(9, relatorioOperationalRiskIndexByClient.getAccountISL());
+						 statement.setString(10, relatorioOperationalRiskIndexByClient.getAccountContractManager());
+						 statement.setString(11, relatorioOperationalRiskIndexByClient.getCDPAccountManager());
+						 statement.setString(12, relatorioOperationalRiskIndexByClient.getCDPControlID());
+						 statement.setString(13, relatorioOperationalRiskIndexByClient.getControlName());
+						 statement.setString(14, relatorioOperationalRiskIndexByClient.getControlCategory());
+						 statement.setString(15, relatorioOperationalRiskIndexByClient.getDeliveryLocationSource());
+						 statement.setString(16, relatorioOperationalRiskIndexByClient.getControlOwner());
+						 statement.setString(17, relatorioOperationalRiskIndexByClient.getComplianceStatus());
+						 statement.setString(18, relatorioOperationalRiskIndexByClient.getLastCompletedDate());
+						 statement.setString(19, relatorioOperationalRiskIndexByClient.getNextDueDate());
+						 statement.setString(20, relatorioOperationalRiskIndexByClient.getNbrDaysNonCompliant());
+						 statement.setString(21, relatorioOperationalRiskIndexByClient.getNbrDaysPastDue());
+						 statement.setString(22, relatorioOperationalRiskIndexByClient.getWeightedOperationalRisk());
+						 statement.setString(23, relatorioOperationalRiskIndexByClient.getMonthEndWeightedOperationalRisk());
+						 statement.setString(24, relatorioOperationalRiskIndexByClient.getDataExtracao());
+						 
+						 statement.executeUpdate();
+						 contador++;
+						 System.out.println("Relatorio Operational Risk Index By Client. Inseri o registro de numero: " + contador + " de um total de " + listaRelatorioOperationalRiskIndexByClient.size());
+					 }
 					 
 				 }
 				 

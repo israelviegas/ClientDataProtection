@@ -13,18 +13,18 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import bean.RelatorioControlsDueThisMonth;
-import bean.RelatorioOperationalRiskIndexByClient;
+import bean.RelatorioOperationalRiskIndexReport;
 import cdp.dao.ClientDataProtectionDao;
 
 public class TesteClick {
 	
 	private static List<RelatorioControlsDueThisMonth> listaRelatorioControlsDueThisMonth;
-	private static List<RelatorioOperationalRiskIndexByClient> listaRelatorioOperationalRiskIndexByClient;
+	private static List<RelatorioOperationalRiskIndexReport> listaRelatorioOperationalRiskIndexByClient;
 
 	public static void main(String[] args) throws Exception {
 		
    		listaRelatorioControlsDueThisMonth = new ArrayList<RelatorioControlsDueThisMonth>();
-		listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexByClient>();
+		listaRelatorioOperationalRiskIndexByClient = new ArrayList<RelatorioOperationalRiskIndexReport>();
 		
 		ClientDataProtectionDao testeClientDataProtectionDao = new ClientDataProtectionDao();
 		
@@ -42,7 +42,7 @@ public class TesteClick {
 		
 		obj.lerRelatorioControlsDueThisMonth(subdiretorioRelatoriosBaixados2 + "/" + "ControlsDueThisMonth.xlsx", subdiretorioRelatoriosBaixados, listaRelatorioControlsDueThisMonth);
 		
-		obj.lerRelatorioOperationalRiskIndexByClient(subdiretorioRelatoriosBaixados2 + "/" + "Operational Risk Index By Client.xlsx", subdiretorioRelatoriosBaixados, listaRelatorioOperationalRiskIndexByClient);
+		obj.lerRelatorioOperationalRiskIndexReport(subdiretorioRelatoriosBaixados2 + "/" + "Operational Risk Index By Client.xlsx", subdiretorioRelatoriosBaixados, listaRelatorioOperationalRiskIndexByClient);
 		
 		Robot robo= new Robot();
 		RoboCapturaTeclas rob= new RoboCapturaTeclas(robo);
