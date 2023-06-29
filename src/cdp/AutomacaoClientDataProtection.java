@@ -650,7 +650,7 @@ public class AutomacaoClientDataProtection {
         					   relatorioOperationalRiskIndexReport.setTier(cell.getStringCellValue());
         					   break;
         				   case 3:
-        					   relatorioOperationalRiskIndexReport.setMasterCustomerNbr(String.valueOf(cell.getNumericCellValue()));
+        					   relatorioOperationalRiskIndexReport.setMasterCustomerNbr(cell.getStringCellValue());
         					   break;       
         				   case 4:
         					   relatorioOperationalRiskIndexReport.setMarket(cell.getStringCellValue());
