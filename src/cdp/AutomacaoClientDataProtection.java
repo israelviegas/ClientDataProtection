@@ -194,7 +194,8 @@ public class AutomacaoClientDataProtection {
     }
     
 	   public static void moverArquivosEntreDiretorios(String caminhoArquivoOrigem, String caminhoDiretorioDestino, String nomeRelatorio) throws Exception{
-	    	
+		    
+		    Thread.sleep(5000);
 	    	boolean sucesso = false;
 	    	File arquivoOrigem = new File(caminhoArquivoOrigem);
 	        File diretorioDestino = new File(caminhoDiretorioDestino);
@@ -224,6 +225,7 @@ public class AutomacaoClientDataProtection {
 	   
 	   public static void moverArquivosEntreDiretorios2(String caminhoArquivoOrigem, String caminhoDiretorioDestino, String nomeRelatorio) throws Exception{
 	    	
+		    Thread.sleep(5000);
 	    	boolean sucesso = false;
 	    	File arquivoOrigem = new File(caminhoArquivoOrigem);
 	        File diretorioDestino = new File(caminhoDiretorioDestino);
@@ -233,7 +235,7 @@ public class AutomacaoClientDataProtection {
 	        if (!sucesso) {
 	        	contadorErrosMoverArquivos++;
 	        	if (contadorErrosMoverArquivos <=3) {
-	        		System.out.println("Deu erro no metodo moverArquivosEntreDiretorios.Possivel problema do numero de tabs. Tentativa de acerto: " + contadorErrosTabsRelatorios);
+	        		System.out.println("Deu erro no metodo moverArquivosEntreDiretorios2.Possivel problema do numero de tabs. Tentativa de acerto: " + contadorErrosTabsRelatorios);
 	        		moverArquivosEntreDiretorios2(caminhoArquivoOrigem, caminhoDiretorioDestino, nomeRelatorio);
 	        	} else {
 	        		throw new Exception("Ocorreu um erro no momento de mover o relatorio " + caminhoArquivoOrigem + " para " + caminhoDiretorioDestino);
@@ -275,7 +277,7 @@ public class AutomacaoClientDataProtection {
     	//digitarUsuarioSenha();
     	
     	//salvaRelatorio(6, nomeRelatorioControlsDueThisMonth);
-    	Thread.sleep(5000);
+    	Thread.sleep(10000);
     	moverArquivosEntreDiretorios2(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioControlsDueThisMonth, subdiretorioRelatoriosBaixados, nomeRelatorioControlsDueThisMonth);
     	Thread.sleep(1000);
     	
@@ -298,7 +300,7 @@ public class AutomacaoClientDataProtection {
     	//digitarUsuarioSenha();
     	
     	//salvaRelatorio(6, nomeRelatorioOperationalRiskIndexByClient);
-    	Thread.sleep(5000);
+    	Thread.sleep(10000);
     	moverArquivosEntreDiretorios2(Util.getValor("caminho.download.relatorios") + "\\" + nomeRelatorioOperationalRiskIndexReport, subdiretorioRelatoriosBaixados, nomeRelatorioOperationalRiskIndexReport);
     	Thread.sleep(1000);
     }
@@ -759,7 +761,6 @@ public class AutomacaoClientDataProtection {
 	   public static void mataProcessosGoogle() throws IOException, SQLException, InterruptedException{
 			  
 		   // Mata o Google
-		   // Viegas
 		   Runtime.getRuntime().exec(Util.getValor("caminho.matar.google"));
 		   Thread.sleep(3000);
 		   

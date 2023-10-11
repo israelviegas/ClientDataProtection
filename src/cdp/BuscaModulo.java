@@ -24,7 +24,7 @@ public class BuscaModulo {
 
     public static void main(String[] args) throws Exception {
         File pastaPrincipal = new File("C:\\Viegas\\desenvolvimento\\BoaVista\\demandas\\buscaModulos\\code-as400-main");
-        String relatorio = "C:\\Viegas\\desenvolvimento\\BoaVista\\demandas\\buscaModulos\\Panilha.xlsx";
+        String relatorio = "C:\\Viegas\\desenvolvimento\\BoaVista\\demandas\\buscaModulos\\Planilha.xlsx";
         lerPlanilha(relatorio);
         if (programasCobol != null && !programasCobol.isEmpty()) {
         	
